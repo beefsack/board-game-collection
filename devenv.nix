@@ -3,7 +3,7 @@
 {
   languages.java = {
     enable = true;
-    gradle.enable = true; 
+    gradle.enable = true;
   };
 
   languages.kotlin = {
@@ -12,10 +12,16 @@
 
   languages.javascript = {
     enable = true;
+    npm.enable = true;
   };
 
   packages = [
     pkgs.jetbrains.idea-oss
+    pkgs.chromium
   ];
-}
 
+  env = {
+    CHROMIUM_PATH = "${pkgs.chromium}/bin/chromium";
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+  };
+}
