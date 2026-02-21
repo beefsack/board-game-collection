@@ -1,3 +1,60 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { loginUser } from '../../api/auth'
+import { ApiError } from '../../api/client'
+import { useAuthStore } from '../../store/auth'
+import FormField from '../../components/FormField'
+
 export default function LoginPage() {
-  return <div>Login</div>
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const setToken = useAuthStore((s) => s.setToken)
+  const navigate = useNavigate()
+
+  const mutation = useMutation({
+    mutationFn: loginUser,
+    onSuccess: ({ token }) => {
+      setToken(token)
+      navigate('/board-games')
+    },
+  })
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="bg-white rounded-lg shadow p-8 w-full max-w-sm">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Sign in</h1>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            mutation.mutate({ email, password })
+          }}
+          className="space-y-4"
+        >
+          <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} required />
+          <FormField id="password" label="Password" type="password" value={password} onChange={setPassword} required />
+          {mutation.isError && (
+            <p className="text-sm text-red-600">
+              {mutation.error instanceof ApiError && mutation.error.status === 401
+                ? 'Invalid email or password.'
+                : 'Something went wrong. Please try again.'}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+          >
+            {mutation.isPending ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-indigo-600 hover:text-indigo-500">
+            Register
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
 }
