@@ -4,6 +4,12 @@ kind: Kustomization
 resources:
   - ../../base
 
+patches:
+  - path: ingress-host-patch.yaml
+    target:
+      kind: Ingress
+      name: board-game-collection
+
 # CI updates these tags to the specific git SHA after a successful build.
 images:
   - name: ghcr.io/beefsack/board-game-collection-api
