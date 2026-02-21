@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
+import { useAuthStore } from './store/auth'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import BoardGamesPage from './pages/board-games/BoardGamesPage'
+import BoardGameDetailPage from './pages/board-games/BoardGameDetailPage'
+import BoardGameFormPage from './pages/board-games/BoardGameFormPage'
+import DesignersPage from './pages/designers/DesignersPage'
+import DesignerDetailPage from './pages/designers/DesignerDetailPage'
+import PublishersPage from './pages/publishers/PublishersPage'
+import PublisherDetailPage from './pages/publishers/PublisherDetailPage'
+import UsersPage from './pages/users/UsersPage'
+import UserDetailPage from './pages/users/UserDetailPage'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function ProtectedRoute() {
+  const token = useAuthStore((s) => s.token)
+  if (!token) return <Navigate to="/login" replace />
+  return <Outlet />
 }
 
-export default App
+const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
+  { path: '/register', element: <RegisterPage /> },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      { index: true, element: <Navigate to="/board-games" replace /> },
+      { path: '/board-games', element: <BoardGamesPage /> },
+      { path: '/board-games/new', element: <BoardGameFormPage /> },
+      { path: '/board-games/:id', element: <BoardGameDetailPage /> },
+      { path: '/board-games/:id/edit', element: <BoardGameFormPage /> },
+      { path: '/designers', element: <DesignersPage /> },
+      { path: '/designers/:id', element: <DesignerDetailPage /> },
+      { path: '/publishers', element: <PublishersPage /> },
+      { path: '/publishers/:id', element: <PublisherDetailPage /> },
+      { path: '/users', element: <UsersPage /> },
+      { path: '/users/:id', element: <UserDetailPage /> },
+    ],
+  },
+])
+
+export default function App() {
+  return <RouterProvider router={router} />
+}
