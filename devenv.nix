@@ -18,6 +18,7 @@
   packages = [
     pkgs.jetbrains.idea-oss
     pkgs.chromium
+    pkgs.act
   ];
 
   env = {
