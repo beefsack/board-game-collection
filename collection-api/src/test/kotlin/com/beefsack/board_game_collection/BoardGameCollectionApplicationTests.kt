@@ -1,13 +1,10 @@
 package com.beefsack.board_game_collection
 
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class BoardGameCollectionApplicationTests {
+class BoardGameCollectionApplicationTests : IntegrationTestBase() {
 
-	@Test
-	fun contextLoads() {
-	}
-
+    @Test
+    fun contextLoads() {
+    }
 }
