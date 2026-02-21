@@ -1,3 +1,6 @@
 spring:
   application:
     name: board-game-collection
+
+springdoc:
+  default-produces-media-type: application/json

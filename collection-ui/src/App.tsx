@@ -1,5 +1,5 @@
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
-import { useAuthStore } from './store/auth'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import AppShell from './components/AppShell'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import BoardGamesPage from './pages/board-games/BoardGamesPage'
@@ -12,17 +12,11 @@ import PublisherDetailPage from './pages/publishers/PublisherDetailPage'
 import UsersPage from './pages/users/UsersPage'
 import UserDetailPage from './pages/users/UserDetailPage'
 
-function ProtectedRoute() {
-  const token = useAuthStore((s) => s.token)
-  if (!token) return <Navigate to="/login" replace />
-  return <Outlet />
-}
-
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   {
-    element: <ProtectedRoute />,
+    element: <AppShell />,
     children: [
       { index: true, element: <Navigate to="/board-games" replace /> },
       { path: '/board-games', element: <BoardGamesPage /> },

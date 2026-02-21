@@ -3,6 +3,7 @@ package com.beefsack.board_game_collection.controller
 import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.dto.BoardGameRequest
 import com.beefsack.board_game_collection.service.BoardGameService
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
@@ -15,20 +16,25 @@ import java.util.UUID
 class BoardGameController(private val service: BoardGameService) {
 
     @GetMapping
+    @Operation(operationId = "listBoardGames")
     fun getAll(): List<BoardGame> = service.findAll()
 
     @GetMapping("/{id}")
+    @Operation(operationId = "getBoardGame")
     fun getById(@PathVariable id: UUID): BoardGame = service.findById(id)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(operationId = "createBoardGame")
     fun create(@Valid @RequestBody request: BoardGameRequest): BoardGame = service.create(request)
 
     @PutMapping("/{id}")
+    @Operation(operationId = "updateBoardGame")
     fun update(@PathVariable id: UUID, @Valid @RequestBody request: BoardGameRequest): BoardGame =
         service.update(id, request)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(operationId = "deleteBoardGame")
     fun delete(@PathVariable id: UUID) = service.delete(id)
 }
