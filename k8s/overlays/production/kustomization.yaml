@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+# CI updates these tags to the specific git SHA after a successful build.
+images:
+  - name: ghcr.io/beefsack/board-game-collection-api
+    newTag: latest
+  - name: ghcr.io/beefsack/board-game-collection-ui
+    newTag: latest

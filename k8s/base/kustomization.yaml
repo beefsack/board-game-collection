@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: board-game-collection
+
+resources:
+  - namespace.yaml
+  - api/deployment.yaml
+  - api/service.yaml
+  - ui/deployment.yaml
+  - ui/service.yaml
+  - postgres/statefulset.yaml
+  - postgres/service.yaml
+  - minio/deployment.yaml
+  - minio/service.yaml
+  - minio/pvc.yaml
+  - ingress.yaml
