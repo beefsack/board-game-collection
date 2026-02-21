@@ -168,8 +168,9 @@ export default function BoardGameFormPage() {
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
           <input
+            id="title"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -179,8 +180,9 @@ export default function BoardGameFormPage() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year</label>
             <input
+              id="year"
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value)}
@@ -190,10 +192,11 @@ export default function BoardGameFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="playTime" className="block text-sm font-medium text-gray-700 mb-1">
               Play time (min)
             </label>
             <input
+              id="playTime"
               type="number"
               value={playTime}
               onChange={(e) => setPlayTime(e.target.value)}
@@ -205,8 +208,9 @@ export default function BoardGameFormPage() {
 
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Min players</label>
+            <label htmlFor="minPlayers" className="block text-sm font-medium text-gray-700 mb-1">Min players</label>
             <input
+              id="minPlayers"
               type="number"
               value={minPlayers}
               onChange={(e) => setMinPlayers(e.target.value)}
@@ -215,8 +219,9 @@ export default function BoardGameFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max players</label>
+            <label htmlFor="maxPlayers" className="block text-sm font-medium text-gray-700 mb-1">Max players</label>
             <input
+              id="maxPlayers"
               type="number"
               value={maxPlayers}
               onChange={(e) => setMaxPlayers(e.target.value)}
@@ -225,8 +230,9 @@ export default function BoardGameFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+            <label htmlFor="weight" className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
             <input
+              id="weight"
               type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
