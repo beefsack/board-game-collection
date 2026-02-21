@@ -7,6 +7,6 @@ resources:
 # CI updates these tags to the specific git SHA after a successful build.
 images:
   - name: ghcr.io/beefsack/board-game-collection-api
-    newTag: latest
+    newTag: 2f0fe61d3475d827e5f0424f9af883acc50a77b6
   - name: ghcr.io/beefsack/board-game-collection-ui
-    newTag: latest
+    newTag: 2f0fe61d3475d827e5f0424f9af883acc50a77b6
