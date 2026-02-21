@@ -20,6 +20,10 @@
     pkgs.chromium
     pkgs.act
     pkgs.gh
+    pkgs.kubectl
+    pkgs.k9s
+    pkgs.argocd
+    pkgs.openssl
   ];
 
   env = {

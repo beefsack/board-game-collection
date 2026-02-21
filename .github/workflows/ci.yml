@@ -87,7 +87,8 @@ jobs:
             ghcr.io/beefsack/board-game-collection-ui:${{ github.sha }}
 
       - name: Update production image tags
-        run: sed -i 's/newTag: .*/newTag: ${{ github.sha }}/g' k8s/overlays/production/kustomization.yaml
+        run: |
+          sed -i 's/newTag: .*/newTag: ${{ github.sha }}/g' k8s/overlays/production/kustomization.yaml
 
       - name: Commit updated manifests
         run: |
