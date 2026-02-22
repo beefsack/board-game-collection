@@ -28,6 +28,9 @@ test('add game link navigates to create form', async ({ page }) => {
 test('create form submits new game and redirects to detail', async ({ page }) => {
   await page.route('**/api/designers', (route) => route.fulfill({ json: [] }))
   await page.route('**/api/publishers', (route) => route.fulfill({ json: [] }))
+  await page.route('**/api/board-games/*', (route) =>
+    route.fulfill({ json: { id: 'g-new', title: 'Wingspan' } }),
+  )
   await page.route('**/api/board-games', (route) => {
     if (route.request().method() === 'POST') {
       route.fulfill({ json: { id: 'g-new', title: 'Wingspan' } })
