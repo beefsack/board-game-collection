@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -10,8 +10,12 @@ export default function AppShell() {
   const displayName = useAuthStore((s) => s.displayName)
   const clearAuth = useAuthStore((s) => s.clearAuth)
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   if (!token) return <Navigate to="/login" replace />
+
+  const collectionsActive =
+    pathname.startsWith('/users') && !pathname.startsWith(`/users/${userId}`)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,7 +25,7 @@ export default function AppShell() {
           <NavLink to={`/users/${userId}`} className={navLinkClass}>My Collection</NavLink>
           <NavLink to="/designers" className={navLinkClass}>Designers</NavLink>
           <NavLink to="/publishers" className={navLinkClass}>Publishers</NavLink>
-          <NavLink to="/users" className={navLinkClass}>Collections</NavLink>
+          <NavLink to="/users" className={() => navLinkClass({ isActive: collectionsActive })}>Collections</NavLink>
           <div className="ml-auto flex items-center gap-3">
             {displayName && (
               <span className="text-sm text-gray-600">{displayName}</span>

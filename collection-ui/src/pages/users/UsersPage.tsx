@@ -23,12 +23,8 @@ export default function UsersPage() {
                 className="flex items-center justify-between py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {u.displayName} — {u.gameCount ?? 0} {u.gameCount === 1 ? 'game' : 'games'}
-                  </p>
-                  {u.role && (
-                    <p className="text-xs text-gray-400 capitalize">{u.role.toLowerCase()}</p>
-                  )}
+                  <p className="text-sm font-medium text-gray-900">{u.displayName}</p>
+                  <p className="text-xs text-gray-400">{u.gameCount ?? 0} {u.gameCount === 1 ? 'game' : 'games'}</p>
                 </div>
                 <span className="text-gray-300">›</span>
               </Link>

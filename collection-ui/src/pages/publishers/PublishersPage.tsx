@@ -58,9 +58,10 @@ export default function PublishersPage() {
                 to={`/publishers/${p.id}`}
                 className="flex items-center justify-between py-3 hover:text-indigo-600 transition-colors"
               >
-                <span className="text-sm font-medium text-gray-900">
-                  {p.name} — {p.gameCount ?? 0} {p.gameCount === 1 ? 'game' : 'games'}
-                </span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                  <p className="text-xs text-gray-400">{p.gameCount ?? 0} {p.gameCount === 1 ? 'game' : 'games'}</p>
+                </div>
                 <span className="text-gray-300">›</span>
               </Link>
             </li>
