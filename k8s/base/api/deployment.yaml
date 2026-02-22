@@ -35,3 +35,17 @@ spec:
                 secretKeyRef:
                   name: jwt-rsa-key
                   key: private-key
+            - name: APP_MINIO_ENDPOINT
+              value: http://minio:9000
+            - name: APP_MINIO_BUCKET
+              value: board-games
+            - name: APP_MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-user
+            - name: APP_MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-password

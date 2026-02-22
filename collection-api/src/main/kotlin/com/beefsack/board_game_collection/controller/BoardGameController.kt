@@ -3,17 +3,24 @@ package com.beefsack.board_game_collection.controller
 import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.dto.BoardGameRequest
 import com.beefsack.board_game_collection.service.BoardGameService
+import com.beefsack.board_game_collection.service.ImageService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
 @RestController
 @RequestMapping("/api/board-games")
 @Validated
-class BoardGameController(private val service: BoardGameService) {
+class BoardGameController(
+    private val service: BoardGameService,
+    private val imageService: ImageService,
+) {
 
     @GetMapping
     @Operation(operationId = "listBoardGames")
@@ -37,4 +44,17 @@ class BoardGameController(private val service: BoardGameService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(operationId = "deleteBoardGame")
     fun delete(@PathVariable id: UUID) = service.delete(id)
+
+    @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(operationId = "uploadBoardGameImage")
+    fun uploadImage(@PathVariable id: UUID, @RequestParam("file") file: MultipartFile) =
+        imageService.upload(id, file)
+
+    @GetMapping("/{id}/image", produces = [MediaType.IMAGE_JPEG_VALUE])
+    @Operation(operationId = "getBoardGameImage")
+    fun getImage(@PathVariable id: UUID): ResponseEntity<ByteArray> =
+        ResponseEntity.ok()
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(imageService.download(id))
 }
