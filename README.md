@@ -1,6 +1,6 @@
 # Board Game Collection
 
-A full-stack web application for managing a personal board game catalogue. Built as a portfolio piece to demonstrate production-ready patterns across the stack.
+A full-stack web application for managing a personal board game catalogue. Built as a portfolio piece demonstrating production-ready patterns across the stack.
 
 Live: **https://board-game-collection.beefsack.com**
 
@@ -74,11 +74,11 @@ All backend process types (web server, long-running worker, cron jobs) are packa
 
 ### Type-safe API client via Orval
 
-The backend exposes an OpenAPI spec via springdoc. Orval generates a fully-typed React Query client from that spec at build time (`npm run generate`). This means the frontend never manually writes fetch calls — it imports generated hooks (`useGetBoardGames`, `useCreateBoardGame`, etc.) that are always in sync with the backend contract.
+The backend exposes an OpenAPI spec via springdoc. Orval generates a fully-typed React Query client from that spec at build time (`npm run generate`). The frontend imports generated hooks (`useGetBoardGames`, `useCreateBoardGame`, etc.) that are always in sync with the backend contract.
 
 ### Self-hosted stateful services
 
-PostgreSQL and MinIO run as `StatefulSet`s in the Kubernetes cluster. This is a deliberate cost trade-off for a personal project. In a production environment these would be replaced by managed services (e.g. RDS, S3).
+PostgreSQL and MinIO run as `StatefulSet`s in the Kubernetes cluster. Cost trade-off for a personal project - in a production environment these would be replaced by managed services (e.g. RDS, S3).
 
 ### RBAC via Spring Security method security
 
@@ -98,14 +98,14 @@ ArgoCD runs inside the cluster and watches the `k8s/` directory. Pushing a manif
 
 ---
 
-## Known gaps (deliberate)
+## Known gaps
 
-These are documented shortcuts — things intentionally omitted to keep scope reasonable for a portfolio project:
+Deliberate shortcuts taken to keep scope manageable:
 
-- **No JWT refresh tokens** — tokens expire after 1 hour; users re-authenticate.
-- **No auth rate limiting** — login/register endpoints are unprotected against brute force.
-- **Images served via API pods** — not via CDN or direct MinIO public URL.
-- **No pod resource requests/limits** — workloads are unconstrained on the cluster.
-- **No structured logging or observability** — stdout only; no Prometheus/Grafana/tracing.
-- **Admin promotion via raw SQL** — `UPDATE users SET role = 'ADMIN' WHERE email = '...'`
-- **No image resizing/thumbnails** — originals are stored and served as-is.
+- **No JWT refresh tokens** - tokens expire after 1 hour; users re-authenticate.
+- **No auth rate limiting** - login/register endpoints are unprotected against brute force.
+- **Images served via API pods** - not via CDN or direct MinIO public URL.
+- **No pod resource requests/limits** - workloads are unconstrained on the cluster.
+- **No structured logging or observability** - stdout only; no Prometheus/Grafana/tracing.
+- **Admin promotion via raw SQL** - `UPDATE users SET role = 'ADMIN' WHERE email = '...'`
+- **No image resizing/thumbnails** - originals are stored and served as-is.
