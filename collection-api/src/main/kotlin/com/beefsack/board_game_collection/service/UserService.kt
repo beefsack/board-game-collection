@@ -26,7 +26,13 @@ class UserService(
     @Transactional(readOnly = true)
     fun findAll(): List<UserResponse> {
         val counts = userBoardGameRepo.countGroupedByUser().associate { it.id to it.count }
-        return userRepo.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+        val topMappings = userBoardGameRepo.findTopGameMappingsPerUser()
+        val gamesById = boardGameRepo.findAllById(topMappings.map { it.boardGameId }.toSet()).associateBy { it.id!! }
+        val topGamesPerUser = topMappings.groupBy { it.entityId }
+            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId] } }
+        return userRepo.findAll().map {
+            it.toResponse(counts[it.id] ?: 0, topGamesPerUser[it.id] ?: emptyList())
+        }
     }
 
     @Transactional(readOnly = true)
@@ -47,11 +53,12 @@ class UserService(
     fun removeFromCollection(userId: UUID, boardGameId: UUID) =
         userBoardGameRepo.deleteByUserIdAndBoardGameId(userId, boardGameId)
 
-    private fun User.toResponse(gameCount: Int = 0) = UserResponse(
+    private fun User.toResponse(gameCount: Int = 0, topGames: List<BoardGame> = emptyList()) = UserResponse(
         id = id,
         email = email,
         displayName = displayName,
         role = role,
         gameCount = gameCount,
+        topGames = topGames,
     )
 }

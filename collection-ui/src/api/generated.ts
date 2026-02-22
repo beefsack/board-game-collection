@@ -29,41 +29,6 @@ export interface PublisherRequest {
   name: string;
 }
 
-export interface PublisherResponse {
-  id?: string;
-  name?: string;
-  gameCount?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface DesignerRequest {
-  /** @minLength 1 */
-  name: string;
-}
-
-export interface DesignerResponse {
-  id?: string;
-  name?: string;
-  gameCount?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface BoardGameRequest {
-  /** @minLength 1 */
-  title: string;
-  yearPublished?: number;
-  minPlayers?: number;
-  maxPlayers?: number;
-  minPlayTimeMinutes?: number;
-  maxPlayTimeMinutes?: number;
-  weight?: number;
-  rating?: number;
-  designerIds?: string[];
-  publisherIds?: string[];
-}
-
 export interface BoardGameDesigner {
   designerId?: string;
 }
@@ -87,6 +52,43 @@ export interface BoardGame {
   publishers?: BoardGamePublisher[];
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface PublisherResponse {
+  id?: string;
+  name?: string;
+  gameCount?: number;
+  topGames?: BoardGame[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DesignerRequest {
+  /** @minLength 1 */
+  name: string;
+}
+
+export interface DesignerResponse {
+  id?: string;
+  name?: string;
+  gameCount?: number;
+  topGames?: BoardGame[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BoardGameRequest {
+  /** @minLength 1 */
+  title: string;
+  yearPublished?: number;
+  minPlayers?: number;
+  maxPlayers?: number;
+  minPlayTimeMinutes?: number;
+  maxPlayTimeMinutes?: number;
+  weight?: number;
+  rating?: number;
+  designerIds?: string[];
+  publisherIds?: string[];
 }
 
 export interface CollectionEntryRequest {
@@ -135,6 +137,7 @@ export interface UserResponse {
   displayName?: string;
   role?: string;
   gameCount?: number;
+  topGames?: BoardGame[];
 }
 
 export interface UserCollectionResponse {

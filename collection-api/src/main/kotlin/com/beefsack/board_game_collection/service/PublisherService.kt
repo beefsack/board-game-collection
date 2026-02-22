@@ -1,8 +1,10 @@
 package com.beefsack.board_game_collection.service
 
+import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.Publisher
 import com.beefsack.board_game_collection.dto.PublisherRequest
 import com.beefsack.board_game_collection.dto.PublisherResponse
+import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.PublisherRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -13,12 +15,21 @@ import java.util.UUID
 
 @Service
 @Transactional
-class PublisherService(private val repo: PublisherRepository) {
+class PublisherService(
+    private val repo: PublisherRepository,
+    private val boardGameRepo: BoardGameRepository,
+) {
 
     @Transactional(readOnly = true)
     fun findAll(): List<PublisherResponse> {
         val counts = repo.countGamesPerPublisher().associate { it.id to it.count }
-        return repo.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+        val topMappings = repo.findTopGameMappingsPerPublisher()
+        val gamesById = boardGameRepo.findAllById(topMappings.map { it.boardGameId }.toSet()).associateBy { it.id!! }
+        val topGamesPerPublisher = topMappings.groupBy { it.entityId }
+            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId] } }
+        return repo.findAll().map {
+            it.toResponse(counts[it.id] ?: 0, topGamesPerPublisher[it.id] ?: emptyList())
+        }
     }
 
     @Transactional(readOnly = true)
@@ -39,10 +50,11 @@ class PublisherService(private val repo: PublisherRepository) {
 
     fun delete(id: UUID) = repo.deleteById(id)
 
-    private fun Publisher.toResponse(gameCount: Int) = PublisherResponse(
+    private fun Publisher.toResponse(gameCount: Int, topGames: List<BoardGame> = emptyList()) = PublisherResponse(
         id = id,
         name = name,
         gameCount = gameCount,
+        topGames = topGames,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

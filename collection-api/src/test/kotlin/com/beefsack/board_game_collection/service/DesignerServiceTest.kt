@@ -3,6 +3,7 @@ package com.beefsack.board_game_collection.service
 import com.beefsack.board_game_collection.domain.Designer
 import com.beefsack.board_game_collection.dto.DesignerRequest
 import com.beefsack.board_game_collection.dto.DesignerResponse
+import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.DesignerRepository
 import io.mockk.every
 import io.mockk.just
@@ -20,7 +21,8 @@ import java.util.UUID
 class DesignerServiceTest {
 
     private val repo: DesignerRepository = mockk()
-    private val service = DesignerService(repo)
+    private val boardGameRepo: BoardGameRepository = mockk()
+    private val service = DesignerService(repo, boardGameRepo)
 
     @Test
     fun `findAll returns list from repository`() {
@@ -28,6 +30,8 @@ class DesignerServiceTest {
         val designer = Designer(id = id, name = "Reiner Knizia")
         every { repo.findAll() } returns listOf(designer)
         every { repo.countGamesPerDesigner() } returns emptyList()
+        every { repo.findTopGameMappingsPerDesigner() } returns emptyList()
+        every { boardGameRepo.findAllById(emptySet<UUID>()) } returns emptyList()
 
         val result = service.findAll()
         assertEquals(1, result.size)

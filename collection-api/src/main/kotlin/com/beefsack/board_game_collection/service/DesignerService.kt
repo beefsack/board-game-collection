@@ -1,8 +1,10 @@
 package com.beefsack.board_game_collection.service
 
+import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.Designer
 import com.beefsack.board_game_collection.dto.DesignerRequest
 import com.beefsack.board_game_collection.dto.DesignerResponse
+import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.DesignerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -13,12 +15,21 @@ import java.util.UUID
 
 @Service
 @Transactional
-class DesignerService(private val repo: DesignerRepository) {
+class DesignerService(
+    private val repo: DesignerRepository,
+    private val boardGameRepo: BoardGameRepository,
+) {
 
     @Transactional(readOnly = true)
     fun findAll(): List<DesignerResponse> {
         val counts = repo.countGamesPerDesigner().associate { it.id to it.count }
-        return repo.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+        val topMappings = repo.findTopGameMappingsPerDesigner()
+        val gamesById = boardGameRepo.findAllById(topMappings.map { it.boardGameId }.toSet()).associateBy { it.id!! }
+        val topGamesPerDesigner = topMappings.groupBy { it.entityId }
+            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId] } }
+        return repo.findAll().map {
+            it.toResponse(counts[it.id] ?: 0, topGamesPerDesigner[it.id] ?: emptyList())
+        }
     }
 
     @Transactional(readOnly = true)
@@ -39,10 +50,11 @@ class DesignerService(private val repo: DesignerRepository) {
 
     fun delete(id: UUID) = repo.deleteById(id)
 
-    private fun Designer.toResponse(gameCount: Int) = DesignerResponse(
+    private fun Designer.toResponse(gameCount: Int, topGames: List<BoardGame> = emptyList()) = DesignerResponse(
         id = id,
         name = name,
         gameCount = gameCount,
+        topGames = topGames,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

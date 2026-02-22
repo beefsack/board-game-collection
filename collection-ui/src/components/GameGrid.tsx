@@ -4,6 +4,7 @@ import type { BoardGame } from '../api/generated'
 interface GameGridProps {
   games: BoardGame[]
   ownedGameIds?: Set<string>
+  variant?: 'default' | 'compact' | 'top-games-row'
 }
 
 function compactStats(game: BoardGame): [string, string] {
@@ -22,13 +23,20 @@ function compactStats(game: BoardGame): [string, string] {
   return [line1, line2]
 }
 
-export default function GameGrid({ games, ownedGameIds }: GameGridProps) {
+export default function GameGrid({ games, ownedGameIds, variant = 'default' }: GameGridProps) {
   if (games.length === 0) {
     return <p className="text-sm text-gray-500">No games found.</p>
   }
 
+  const gridClasses: Record<NonNullable<typeof variant>, string> = {
+    'default': 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4',
+    'compact': 'grid grid-cols-3 sm:grid-cols-5 gap-2 max-w-2xl',
+    'top-games-row': 'grid grid-cols-5 gap-2 max-w-2xl',
+  }
+  const gridClass = gridClasses[variant ?? 'default']
+
   return (
-    <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <ul className={gridClass}>
       {games.map((game) => {
         const [line1, line2] = compactStats(game)
         return (

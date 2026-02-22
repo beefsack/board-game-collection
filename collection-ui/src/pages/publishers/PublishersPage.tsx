@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useListPublishers, useCreatePublisher } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
+import GameGrid from '../../components/GameGrid'
 
 export default function PublishersPage() {
   const qc = useQueryClient()
@@ -25,11 +26,11 @@ export default function PublishersPage() {
   }
 
   return (
-    <div className="max-w-lg">
+    <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Publishers</h1>
 
       {isAdmin && (
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+        <form onSubmit={handleSubmit} className="flex gap-2 mb-6 max-w-lg">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -51,22 +52,27 @@ export default function PublishersPage() {
       ) : publishers.length === 0 ? (
         <p className="text-sm text-gray-500">No publishers yet.</p>
       ) : (
-        <ul className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100">
           {publishers.map((p) => (
-            <li key={p.id}>
-              <Link
-                to={`/publishers/${p.id}`}
-                className="flex items-center justify-between py-3 hover:text-indigo-600 transition-colors"
-              >
+            <div key={p.id} className="py-6">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                  <Link
+                    to={`/publishers/${p.id}`}
+                    className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                  >
+                    {p.name}
+                  </Link>
                   <p className="text-xs text-gray-400">{p.gameCount ?? 0} {p.gameCount === 1 ? 'game' : 'games'}</p>
                 </div>
-                <span className="text-gray-300">›</span>
-              </Link>
-            </li>
+                <Link to={`/publishers/${p.id}`} className="text-gray-300">›</Link>
+              </div>
+              {(p.topGames ?? []).length > 0 && (
+                <GameGrid games={p.topGames!} variant="top-games-row" />
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )

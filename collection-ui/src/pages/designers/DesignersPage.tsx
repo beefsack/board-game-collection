@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useListDesigners, useCreateDesigner } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
+import GameGrid from '../../components/GameGrid'
 
 export default function DesignersPage() {
   const qc = useQueryClient()
@@ -25,11 +26,11 @@ export default function DesignersPage() {
   }
 
   return (
-    <div className="max-w-lg">
+    <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Designers</h1>
 
       {isAdmin && (
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+        <form onSubmit={handleSubmit} className="flex gap-2 mb-6 max-w-lg">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -51,22 +52,27 @@ export default function DesignersPage() {
       ) : designers.length === 0 ? (
         <p className="text-sm text-gray-500">No designers yet.</p>
       ) : (
-        <ul className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100">
           {designers.map((d) => (
-            <li key={d.id}>
-              <Link
-                to={`/designers/${d.id}`}
-                className="flex items-center justify-between py-3 hover:text-indigo-600 transition-colors"
-              >
+            <div key={d.id} className="py-6">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{d.name}</p>
+                  <Link
+                    to={`/designers/${d.id}`}
+                    className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                  >
+                    {d.name}
+                  </Link>
                   <p className="text-xs text-gray-400">{d.gameCount ?? 0} {d.gameCount === 1 ? 'game' : 'games'}</p>
                 </div>
-                <span className="text-gray-300">›</span>
-              </Link>
-            </li>
+                <Link to={`/designers/${d.id}`} className="text-gray-300">›</Link>
+              </div>
+              {(d.topGames ?? []).length > 0 && (
+                <GameGrid games={d.topGames!} variant="top-games-row" />
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )
