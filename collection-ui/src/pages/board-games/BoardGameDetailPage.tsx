@@ -10,6 +10,7 @@ import {
 } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
 import { useOwnedGameIds } from '../../hooks/useOwnedGameIds'
+import BoardGameStatsSidebar from '../../components/BoardGameStatsSidebar'
 
 export default function BoardGameDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -64,95 +65,101 @@ export default function BoardGameDetailPage() {
   ]
 
   return (
-    <div className="max-w-2xl">
-      {game.hasImage && (
-        <img src={`/images/board-games/${id}`} alt="" className="rounded-xl max-w-full mb-6" />
-      )}
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="flex-1 min-w-0 max-w-2xl">
+        {game.hasImage && (
+          <img src={`/images/board-games/${id}`} alt="" className="rounded-xl max-w-full mb-6" />
+        )}
 
-      <div className="flex items-start justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">{game.title}</h1>
-        <div className="flex gap-2 shrink-0 ml-4">
-          {userId && (
-            <button
-              onClick={() =>
-                isOwned
-                  ? window.confirm('Remove from your collection?') && removeFromCollection({ id: userId, gameId: id! })
-                  : addToCollection({ id: userId, data: { boardGameId: id } })
-              }
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                isOwned
-                  ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                  : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {isOwned ? 'In my collection' : 'Add to my collection'}
-            </button>
-          )}
-          {isAdmin && (
-            <>
-              <Link
-                to={`/board-games/${id}/edit`}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Edit
-              </Link>
+        <div className="flex items-start justify-between mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">{game.title}</h1>
+          <div className="flex gap-2 shrink-0 ml-4">
+            {userId && (
               <button
                 onClick={() =>
-                  window.confirm('Delete this game?') && deleteGame({ id: id! })
+                  isOwned
+                    ? window.confirm('Remove from your collection?') && removeFromCollection({ id: userId, gameId: id! })
+                    : addToCollection({ id: userId, data: { boardGameId: id } })
                 }
-                className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  isOwned
+                    ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
               >
-                Delete
+                {isOwned ? 'In my collection' : 'Add to my collection'}
               </button>
-            </>
-          )}
+            )}
+            {isAdmin && (
+              <>
+                <Link
+                  to={`/board-games/${id}/edit`}
+                  className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() =>
+                    window.confirm('Delete this game?') && deleteGame({ id: id! })
+                  }
+                  className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
         </div>
+
+        <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {meta.map(([label, value]) =>
+            value != null ? (
+              <div key={label} className="bg-gray-50 rounded-lg p-3">
+                <dt className="text-xs text-gray-500 mb-0.5">{label}</dt>
+                <dd className="text-sm font-medium text-gray-900">{value}</dd>
+              </div>
+            ) : null,
+          )}
+        </dl>
+
+        {gameDesigners.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-sm font-medium text-gray-500 mb-2">Designers</h2>
+            <div className="flex flex-wrap gap-2">
+              {gameDesigners.map((d) => (
+                <Link
+                  key={d.id}
+                  to={`/designers/${d.id}`}
+                  className="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 hover:bg-indigo-100 transition-colors"
+                >
+                  {d.name}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {gamePublishers.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-sm font-medium text-gray-500 mb-2">Publishers</h2>
+            <div className="flex flex-wrap gap-2">
+              {gamePublishers.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/publishers/${p.id}`}
+                  className="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 hover:bg-indigo-100 transition-colors"
+                >
+                  {p.name}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
-      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        {meta.map(([label, value]) =>
-          value != null ? (
-            <div key={label} className="bg-gray-50 rounded-lg p-3">
-              <dt className="text-xs text-gray-500 mb-0.5">{label}</dt>
-              <dd className="text-sm font-medium text-gray-900">{value}</dd>
-            </div>
-          ) : null,
-        )}
-      </dl>
-
-      {gameDesigners.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-medium text-gray-500 mb-2">Designers</h2>
-          <div className="flex flex-wrap gap-2">
-            {gameDesigners.map((d) => (
-              <Link
-                key={d.id}
-                to={`/designers/${d.id}`}
-                className="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 hover:bg-indigo-100 transition-colors"
-              >
-                {d.name}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {gamePublishers.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-medium text-gray-500 mb-2">Publishers</h2>
-          <div className="flex flex-wrap gap-2">
-            {gamePublishers.map((p) => (
-              <Link
-                key={p.id}
-                to={`/publishers/${p.id}`}
-                className="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 hover:bg-indigo-100 transition-colors"
-              >
-                {p.name}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="w-full lg:w-72 shrink-0">
+        <BoardGameStatsSidebar gameId={id!} />
+      </div>
     </div>
   )
 }

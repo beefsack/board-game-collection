@@ -10,6 +10,7 @@ import {
 import { useAuthStore } from '../../store/auth'
 import GameGrid from '../../components/GameGrid'
 import { useOwnedGameIds } from '../../hooks/useOwnedGameIds'
+import EntityStatsSidebar from '../../components/EntityStatsSidebar'
 
 export default function DesignerDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -48,8 +49,11 @@ export default function DesignerDetailPage() {
     g.designers?.some((d) => d.designerId === id),
   )
 
+  const gameLabels = games.map((g) => g.title ?? '')
+
   return (
-    <div className="max-w-2xl">
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="flex-1 min-w-0 max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         {editing ? (
           <form
@@ -109,6 +113,11 @@ export default function DesignerDetailPage() {
           <GameGrid games={games} ownedGameIds={ownedGameIds} />
         </section>
       )}
+      </div>
+
+      <div className="w-full lg:w-72 shrink-0">
+        <EntityStatsSidebar entityId={id!} gameCount={games.length} gameLabels={gameLabels} />
+      </div>
     </div>
   )
 }
