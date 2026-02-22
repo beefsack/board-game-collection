@@ -233,7 +233,49 @@ To further demonstrate breadth of skill, the following enhancements are planned 
     * recorded\_at (TIMESTAMP)
     * *Constraint:* Primary Key is the composite (board\_game\_id, recorded\_at), which also serves as the index for time-range queries and satisfies TimescaleDB's requirement for the time column to be part of the primary key.  
   * *Enterprise Talking Point:* In a real-world scenario handling millions of rows, this standard table could be seamlessly converted into a **TimescaleDB** hypertable (a Postgres extension), offering massive performance gains for time-series data without changing our tech stack.  
-* **Frontend Visualization (Recharts / D3.js):**  
-  * The Board Game Detail view will feature a historical popularity graph.  
-  * We will fetch the time-series data via a new endpoint (e.g., GET /api/board-games/{id}/stats).  
+* **Frontend Visualization (Recharts / D3.js):**
+  * The Board Game Detail view will feature a historical popularity graph.
+  * We will fetch the time-series data via a new endpoint (e.g., GET /api/board-games/{id}/stats).
   * We will render the data using **Recharts**, passing Tailwind utility classes into its SVG stroke/fill properties to match the Tailwind UI aesthetic seamlessly.
+
+### **9.2. TLS / SSL via cert-manager (Let's Encrypt)**
+
+**Objective:** Terminate HTTPS at the nginx ingress controller using a Let's Encrypt certificate managed automatically by cert-manager, so the production site is served over `https://board-game-collection.beefsack.com`.
+
+**Implementation:**
+
+* **Install cert-manager** into the cluster (standard `kubectl apply` of the upstream release manifest). cert-manager runs as a set of controllers in the `cert-manager` namespace and requires no application-level changes.
+
+* **Create a `ClusterIssuer`** (cluster-scoped, so it can issue certificates for any namespace) configured for the Let's Encrypt ACME HTTP-01 challenge. HTTP-01 is the correct choice here because the nginx ingress already handles all inbound HTTP traffic — cert-manager's ACME solver creates a temporary `Ingress` rule to serve the challenge token, then removes it once the certificate is issued. DNS-01 is not needed and would require provider-specific API credentials.
+
+* **Annotate the Ingress** with `cert-manager.io/cluster-issuer: letsencrypt-prod` and add a `tls:` block specifying the `secretName` where the issued certificate will be stored and the hostname. cert-manager watches for this annotation and triggers certificate issuance automatically.
+
+* **TLS termination** is handled entirely by the nginx ingress controller once the `Secret` containing the certificate and private key is populated by cert-manager. No changes to the API or UI pods are needed.
+
+* **Manifest placement:** The `ClusterIssuer` manifest lives in `k8s/overlays/production/` (it is production-only; local dev does not use it). The ingress `tls:` block and annotation are added via a Kustomize patch in the production overlay, keeping the base ingress free of environment-specific config — consistent with the existing `ingress-host-patch.yaml` pattern.
+
+* **Auto-renewal:** cert-manager automatically renews certificates before expiry (Let's Encrypt certificates are valid for 90 days; renewal is triggered at 60 days). No manual intervention required.
+
+### **9.3. Authorization (Role-Based Access Control)**
+
+**Objective:** Restrict write operations so that regular users can only modify their own data, and introduce an `ADMIN` role for privileged operations (managing the board game catalogue, designers, publishers, and all users).
+
+**Current State:** The `users` table already has a `role` column (`VARCHAR(50)`). The JWT is issued at login. No authorization rules are enforced yet — any authenticated user can call any endpoint.
+
+**Proposed Implementation (Idiomatic Spring Security):**
+
+* **Enable method-level security** by adding `@EnableMethodSecurity` to `SecurityConfiguration`. This unlocks Spring Security's `@PreAuthorize` annotation, which is the idiomatic, declarative way to express authorization rules directly on service or controller methods — no custom filter chains or interceptors required.
+
+* **Embed the role in the JWT** at login time as a claim (e.g. `"role": "ADMIN"`). The resource server already validates and parses the JWT, so the role claim is available on the `Authentication` object without an additional database lookup per request.
+
+* **Apply `@PreAuthorize` rules at the service layer:**
+  * Admin-only operations (create/update/delete board games, designers, publishers; manage any user):
+    `@PreAuthorize("hasRole('ADMIN')")`
+  * User-scoped operations (update own collection, own profile):
+    `@PreAuthorize("#id.toString() == authentication.name")` — where `authentication.name` is the user's UUID (the JWT `sub` claim).
+  * Read operations remain open to any authenticated user.
+
+* **No new dependencies required** — `@EnableMethodSecurity` and `@PreAuthorize` are part of `spring-boot-starter-security`, already on the classpath.
+
+* **Promote a user to admin** via a direct SQL update (no admin UI needed initially):
+  `UPDATE users SET role = 'ADMIN' WHERE email = 'you@example.com';`
