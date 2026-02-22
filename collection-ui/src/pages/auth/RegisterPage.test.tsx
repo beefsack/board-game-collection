@@ -13,7 +13,7 @@ vi.mock('../../api/auth', () => ({ registerUser: vi.fn() }))
 
 vi.mock('../../store/auth', () => ({
   useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
-    selector({ token: null, setToken: vi.fn(), clearToken: vi.fn() }),
+    selector({ token: null, setAuth: vi.fn(), clearAuth: vi.fn() }),
   ),
 }))
 
@@ -46,23 +46,25 @@ describe('RegisterPage', () => {
   })
 
   it('calls registerUser with entered credentials on submit', async () => {
-    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token' })
+    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
+    await user.type(screen.getByLabelText('Display name'), 'Alice')
     await user.type(screen.getByLabelText('Email'), 'new@example.com')
     await user.type(screen.getByLabelText('Password'), 'password123')
     await user.click(screen.getByRole('button', { name: 'Create account' }))
     // TanStack Query v5 passes a context object as a second arg to mutationFn
     expect(registerUser).toHaveBeenCalledWith(
-      { email: 'new@example.com', password: 'password123' },
+      { displayName: 'Alice', email: 'new@example.com', password: 'password123' },
       expect.any(Object),
     )
   })
 
   it('navigates to /board-games on successful registration', async () => {
-    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token' })
+    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
+    await user.type(screen.getByLabelText('Display name'), 'Alice')
     await user.type(screen.getByLabelText('Email'), 'new@example.com')
     await user.type(screen.getByLabelText('Password'), 'password123')
     await user.click(screen.getByRole('button', { name: 'Create account' }))
@@ -73,6 +75,7 @@ describe('RegisterPage', () => {
     vi.mocked(registerUser).mockRejectedValue(new ApiError('Conflict', 409))
     const user = userEvent.setup()
     renderPage()
+    await user.type(screen.getByLabelText('Display name'), 'Alice')
     await user.type(screen.getByLabelText('Email'), 'existing@example.com')
     await user.type(screen.getByLabelText('Password'), 'password123')
     await user.click(screen.getByRole('button', { name: 'Create account' }))

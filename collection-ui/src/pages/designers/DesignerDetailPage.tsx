@@ -7,12 +7,14 @@ import {
   useDeleteDesigner,
   useListBoardGames,
 } from '../../api/generated'
+import { useAuthStore } from '../../store/auth'
 import GameGrid from '../../components/GameGrid'
 
 export default function DesignerDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
 
   const { data: designer, isLoading } = useGetDesigner(id!)
   const { data: allGames = [] } = useListBoardGames()
@@ -79,7 +81,7 @@ export default function DesignerDetailPage() {
         ) : (
           <h1 className="text-2xl font-semibold text-gray-900">{designer.name}</h1>
         )}
-        {!editing && (
+        {isAdmin && !editing && (
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => { setName(designer.name ?? ''); setEditing(true) }}

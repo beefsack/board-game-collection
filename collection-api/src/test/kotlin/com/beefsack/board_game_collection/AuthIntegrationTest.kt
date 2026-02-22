@@ -20,25 +20,28 @@ class AuthIntegrationTest : IntegrationTestBase() {
         val result = mockMvc.perform(
             post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(RegisterRequest(email, "password123")))
+                .content(objectMapper.writeValueAsString(RegisterRequest("User", email, "password123")))
         ).andExpect(status().isCreated).andReturn()
         return objectMapper.readTree(result.response.contentAsByteArray)["token"].asText()
     }
 
     @Test
-    fun `register returns 201 with JWT token`() {
+    fun `register returns 201 with JWT token and user info`() {
         mockMvc.perform(
             post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(RegisterRequest("alice@example.com", "password123")))
+                .content(objectMapper.writeValueAsString(RegisterRequest("Alice", "alice@example.com", "password123")))
         )
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.token").isNotEmpty)
+            .andExpect(jsonPath("$.userId").isNotEmpty)
+            .andExpect(jsonPath("$.displayName").value("Alice"))
+            .andExpect(jsonPath("$.role").value("USER"))
     }
 
     @Test
     fun `register with duplicate email returns 409`() {
-        val body = objectMapper.writeValueAsString(RegisterRequest("alice@example.com", "password123"))
+        val body = objectMapper.writeValueAsString(RegisterRequest("Alice", "alice@example.com", "password123"))
         mockMvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(body))
         mockMvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(body))
             .andExpect(status().isConflict)
@@ -49,7 +52,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
         mockMvc.perform(
             post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(RegisterRequest("not-an-email", "password123")))
+                .content(objectMapper.writeValueAsString(RegisterRequest("Alice", "not-an-email", "password123")))
         ).andExpect(status().isBadRequest)
     }
 
@@ -58,12 +61,12 @@ class AuthIntegrationTest : IntegrationTestBase() {
         mockMvc.perform(
             post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(RegisterRequest("alice@example.com", "short")))
+                .content(objectMapper.writeValueAsString(RegisterRequest("Alice", "alice@example.com", "short")))
         ).andExpect(status().isBadRequest)
     }
 
     @Test
-    fun `login with correct credentials returns JWT`() {
+    fun `login with correct credentials returns JWT with user info`() {
         registerAndGetToken("alice@example.com")
 
         mockMvc.perform(
@@ -73,6 +76,9 @@ class AuthIntegrationTest : IntegrationTestBase() {
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.token").isNotEmpty)
+            .andExpect(jsonPath("$.userId").isNotEmpty)
+            .andExpect(jsonPath("$.displayName").value("User"))
+            .andExpect(jsonPath("$.role").value("USER"))
     }
 
     @Test

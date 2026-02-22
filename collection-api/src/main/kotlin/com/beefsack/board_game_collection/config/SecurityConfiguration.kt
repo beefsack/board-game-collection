@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -19,6 +20,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
@@ -31,6 +34,7 @@ import java.util.Base64
 import java.util.UUID
 
 @Configuration
+@EnableMethodSecurity
 class SecurityConfiguration {
 
     @Bean
@@ -80,7 +84,18 @@ class SecurityConfiguration {
         )
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
+        val grantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter().apply {
+            setAuthoritiesClaimName("roles")
+            setAuthorityPrefix("")
+        }
+        return JwtAuthenticationConverter().apply {
+            setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter)
+        }
+    }
+
+    @Bean
+    fun securityFilterChain(http: HttpSecurity, jwtAuthenticationConverter: JwtAuthenticationConverter): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
@@ -88,7 +103,7 @@ class SecurityConfiguration {
                 it.requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error").permitAll()
                 it.anyRequest().authenticated()
             }
-            .oauth2ResourceServer { it.jwt { } }
+            .oauth2ResourceServer { it.jwt { jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter) } }
         return http.build()
     }
 }

@@ -7,12 +7,14 @@ import {
   useDeletePublisher,
   useListBoardGames,
 } from '../../api/generated'
+import { useAuthStore } from '../../store/auth'
 import GameGrid from '../../components/GameGrid'
 
 export default function PublisherDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
 
   const { data: publisher, isLoading } = useGetPublisher(id!)
   const { data: allGames = [] } = useListBoardGames()
@@ -79,7 +81,7 @@ export default function PublisherDetailPage() {
         ) : (
           <h1 className="text-2xl font-semibold text-gray-900">{publisher.name}</h1>
         )}
-        {!editing && (
+        {isAdmin && !editing && (
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => { setName(publisher.name ?? ''); setEditing(true) }}

@@ -6,6 +6,7 @@ import tools.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -23,15 +24,14 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
         val result = mockMvc.perform(
             post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(RegisterRequest("gamer@example.com", "password123")))
+                .content(objectMapper.writeValueAsString(RegisterRequest("Gamer", "gamer@example.com", "password123")))
         ).andReturn()
         return objectMapper.readTree(result.response.contentAsByteArray)["token"].asText()
     }
 
-    private fun createGame(token: String, title: String = "Lost Cities"): String {
+    private fun createGame(title: String = "Lost Cities"): String {
         val result = mockMvc.perform(
             post("/api/board-games")
-                .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
                     BoardGameRequest(
@@ -54,9 +54,10 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
+    @WithMockUser(roles = ["ADMIN"])
     fun `can create and retrieve a board game`() {
+        val id = createGame()
         val token = token()
-        val id = createGame(token)
 
         mockMvc.perform(
             get("/api/board-games/$id")
@@ -69,13 +70,12 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
+    @WithMockUser(roles = ["ADMIN"])
     fun `update changes board game fields`() {
-        val token = token()
-        val id = createGame(token)
+        val id = createGame()
 
         mockMvc.perform(
             put("/api/board-games/$id")
-                .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
                     BoardGameRequest(
@@ -93,15 +93,14 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
+    @WithMockUser(roles = ["ADMIN"])
     fun `delete removes board game`() {
+        val id = createGame()
+
+        mockMvc.perform(delete("/api/board-games/$id"))
+            .andExpect(status().isNoContent)
+
         val token = token()
-        val id = createGame(token)
-
-        mockMvc.perform(
-            delete("/api/board-games/$id")
-                .header("Authorization", "Bearer $token")
-        ).andExpect(status().isNoContent)
-
         mockMvc.perform(
             get("/api/board-games/$id")
                 .header("Authorization", "Bearer $token")

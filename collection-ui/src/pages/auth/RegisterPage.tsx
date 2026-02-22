@@ -7,15 +7,16 @@ import { useAuthStore } from '../../store/auth'
 import FormField from '../../components/FormField'
 
 export default function RegisterPage() {
+  const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const setToken = useAuthStore((s) => s.setToken)
+  const setAuth = useAuthStore((s) => s.setAuth)
   const navigate = useNavigate()
 
   const mutation = useMutation({
     mutationFn: registerUser,
-    onSuccess: ({ token }) => {
-      setToken(token)
+    onSuccess: ({ token, userId, displayName: dn, role }) => {
+      setAuth(token, userId, dn, role)
       navigate('/board-games')
     },
   })
@@ -27,10 +28,11 @@ export default function RegisterPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            mutation.mutate({ email, password })
+            mutation.mutate({ displayName, email, password })
           }}
           className="space-y-4"
         >
+          <FormField id="displayName" label="Display name" type="text" value={displayName} onChange={setDisplayName} required />
           <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} required />
           <FormField id="password" label="Password" type="password" value={password} onChange={setPassword} required minLength={8} />
           {mutation.isError && (

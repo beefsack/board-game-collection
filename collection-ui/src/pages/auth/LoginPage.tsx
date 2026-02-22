@@ -9,13 +9,13 @@ import FormField from '../../components/FormField'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const setToken = useAuthStore((s) => s.setToken)
+  const setAuth = useAuthStore((s) => s.setAuth)
   const navigate = useNavigate()
 
   const mutation = useMutation({
     mutationFn: loginUser,
-    onSuccess: ({ token }) => {
-      setToken(token)
+    onSuccess: ({ token, userId, displayName, role }) => {
+      setAuth(token, userId, displayName, role)
       navigate('/board-games')
     },
   })

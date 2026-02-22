@@ -6,7 +6,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function AppShell() {
   const token = useAuthStore((s) => s.token)
-  const clearToken = useAuthStore((s) => s.clearToken)
+  const displayName = useAuthStore((s) => s.displayName)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
   const navigate = useNavigate()
 
   if (!token) return <Navigate to="/login" replace />
@@ -20,12 +21,17 @@ export default function AppShell() {
           <NavLink to="/designers" className={navLinkClass}>Designers</NavLink>
           <NavLink to="/publishers" className={navLinkClass}>Publishers</NavLink>
           <NavLink to="/users" className={navLinkClass}>Users</NavLink>
-          <button
-            onClick={() => { clearToken(); navigate('/login') }}
-            className="ml-auto text-sm text-gray-400 hover:text-gray-700 transition-colors"
-          >
-            Sign out
-          </button>
+          <div className="ml-auto flex items-center gap-3">
+            {displayName && (
+              <span className="text-sm text-gray-600">{displayName}</span>
+            )}
+            <button
+              onClick={() => { clearAuth(); navigate('/login') }}
+              className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </nav>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

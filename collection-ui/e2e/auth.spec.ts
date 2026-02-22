@@ -10,7 +10,7 @@ test('login page renders sign-in form', async ({ page }) => {
 
 test('successful login redirects to /board-games', async ({ page }) => {
   await page.route('**/api/auth/login', (route) =>
-    route.fulfill({ json: { token: 'fake-jwt' } }),
+    route.fulfill({ json: { token: 'fake-jwt', userId: 'u-1', displayName: 'Alice', role: 'USER' } }),
   )
   await page.route('**/api/board-games', (route) => route.fulfill({ json: [] }))
 
@@ -43,11 +43,12 @@ test('register page renders create-account form', async ({ page }) => {
 
 test('successful registration redirects to /board-games', async ({ page }) => {
   await page.route('**/api/auth/register', (route) =>
-    route.fulfill({ json: { token: 'fake-jwt' } }),
+    route.fulfill({ json: { token: 'fake-jwt', userId: 'u-1', displayName: 'Alice', role: 'USER' } }),
   )
   await page.route('**/api/board-games', (route) => route.fulfill({ json: [] }))
 
   await page.goto('/register')
+  await page.getByLabel('Display name').fill('Alice')
   await page.getByLabel('Email').fill('newuser@example.com')
   await page.getByLabel('Password').fill('password123')
   await page.getByRole('button', { name: 'Create account' }).click()

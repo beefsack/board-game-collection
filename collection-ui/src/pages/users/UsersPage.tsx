@@ -21,7 +21,7 @@ export default function UsersPage() {
                 className="flex items-center justify-between py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{u.email}</p>
+                  <p className="text-sm font-medium text-gray-900">{u.displayName}</p>
                   {u.role && (
                     <p className="text-xs text-gray-400 capitalize">{u.role.toLowerCase()}</p>
                   )}

@@ -6,11 +6,13 @@ import {
   useListDesigners,
   useListPublishers,
 } from '../../api/generated'
+import { useAuthStore } from '../../store/auth'
 
 export default function BoardGameDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
 
   const { data: game, isLoading } = useGetBoardGame(id!)
   const { data: designers = [] } = useListDesigners()
@@ -56,22 +58,24 @@ export default function BoardGameDetailPage() {
 
       <div className="flex items-start justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{game.title}</h1>
-        <div className="flex gap-2 shrink-0 ml-4">
-          <Link
-            to={`/board-games/${id}/edit`}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Edit
-          </Link>
-          <button
-            onClick={() =>
-              window.confirm('Delete this game?') && deleteGame({ id: id! })
-            }
-            className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
-          >
-            Delete
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2 shrink-0 ml-4">
+            <Link
+              to={`/board-games/${id}/edit`}
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Edit
+            </Link>
+            <button
+              onClick={() =>
+                window.confirm('Delete this game?') && deleteGame({ id: id! })
+              }
+              className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
 
       <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

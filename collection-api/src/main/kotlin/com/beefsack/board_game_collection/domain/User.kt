@@ -11,6 +11,7 @@ import java.util.UUID
 data class User(
     @Id val id: UUID? = null,
     val email: String,
+    val displayName: String = "",
     val passwordHash: String,
     val role: String,
     @CreatedDate val createdAt: Instant? = null,

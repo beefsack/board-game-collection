@@ -1,8 +1,10 @@
 package com.beefsack.board_game_collection.dto
 
-data class AuthResponse(
-    val token: String,
-    val userId: String,
+import java.util.UUID
+
+data class UserResponse(
+    val id: UUID?,
+    val email: String,
     val displayName: String,
     val role: String,
 )

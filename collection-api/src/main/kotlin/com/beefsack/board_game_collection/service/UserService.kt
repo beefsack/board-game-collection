@@ -4,6 +4,7 @@ import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.User
 import com.beefsack.board_game_collection.domain.UserBoardGame
 import com.beefsack.board_game_collection.dto.CollectionEntryRequest
+import com.beefsack.board_game_collection.dto.UserResponse
 import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.UserBoardGameRepository
 import com.beefsack.board_game_collection.repository.UserRepository
@@ -23,11 +24,11 @@ class UserService(
 ) {
 
     @Transactional(readOnly = true)
-    fun findAll(): List<User> = userRepo.findAll()
+    fun findAll(): List<UserResponse> = userRepo.findAll().map { it.toResponse() }
 
     @Transactional(readOnly = true)
-    fun findById(id: UUID): User =
-        userRepo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun findById(id: UUID): UserResponse =
+        (userRepo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)).toResponse()
 
     @Transactional(readOnly = true)
     fun findCollection(userId: UUID): List<BoardGame> =
@@ -42,4 +43,11 @@ class UserService(
 
     fun removeFromCollection(userId: UUID, boardGameId: UUID) =
         userBoardGameRepo.deleteByUserIdAndBoardGameId(userId, boardGameId)
+
+    private fun User.toResponse() = UserResponse(
+        id = id,
+        email = email,
+        displayName = displayName,
+        role = role,
+    )
 }

@@ -14,6 +14,12 @@ import {
 const mockNavigate = vi.fn()
 const mockDeleteMutate = vi.fn()
 
+vi.mock('../../store/auth', () => ({
+  useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
+    selector({ role: 'ADMIN' }),
+  ),
+}))
+
 vi.mock('../../api/generated', () => ({
   useGetBoardGame: vi.fn(),
   useDeleteBoardGame: vi.fn(),

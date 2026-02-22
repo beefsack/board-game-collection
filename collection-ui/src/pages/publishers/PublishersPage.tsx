@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useListPublishers, useCreatePublisher } from '../../api/generated'
+import { useAuthStore } from '../../store/auth'
 
 export default function PublishersPage() {
   const qc = useQueryClient()
   const { data: publishers = [], isLoading } = useListPublishers()
+  const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
   const [name, setName] = useState('')
   const { mutate: createPublisher, isPending } = useCreatePublisher({
     mutation: {
@@ -25,21 +27,23 @@ export default function PublishersPage() {
     <div className="max-w-lg">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Publishers</h1>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Publisher name"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-        <button
-          type="submit"
-          disabled={isPending || !name.trim()}
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
-        >
-          Add
-        </button>
-      </form>
+      {isAdmin && (
+        <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Publisher name"
+            className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button
+            type="submit"
+            disabled={isPending || !name.trim()}
+            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          >
+            Add
+          </button>
+        </form>
+      )}
 
       {isLoading ? (
         <p className="text-sm text-gray-500">Loading…</p>

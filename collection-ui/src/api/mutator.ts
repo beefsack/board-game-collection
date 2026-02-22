@@ -20,7 +20,7 @@ export const apiFetch = async <T>(
       ...options.headers,
     },
   })
-  if (res.status === 401) useAuthStore.getState().clearToken()
+  if (res.status === 401) useAuthStore.getState().clearAuth()
   if (!res.ok) throw new ApiError(res.statusText, res.status)
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>

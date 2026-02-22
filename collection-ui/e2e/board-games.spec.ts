@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const AUTH_STORAGE = JSON.stringify({ state: { token: 'fake-jwt' }, version: 0 })
+const AUTH_STORAGE = JSON.stringify({ state: { token: 'fake-jwt', userId: 'u-1', displayName: 'Test User', role: 'ADMIN' }, version: 0 })
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(`localStorage.setItem('auth', ${JSON.stringify(AUTH_STORAGE)})`)

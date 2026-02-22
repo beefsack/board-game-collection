@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -31,21 +32,25 @@ class BoardGameController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "createBoardGame")
     fun create(@Valid @RequestBody request: BoardGameRequest): BoardGame = service.create(request)
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "updateBoardGame")
     fun update(@PathVariable id: UUID, @Valid @RequestBody request: BoardGameRequest): BoardGame =
         service.update(id, request)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "deleteBoardGame")
     fun delete(@PathVariable id: UUID) = service.delete(id)
 
     @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "uploadBoardGameImage")
     fun uploadImage(@PathVariable id: UUID, @RequestParam("file") file: MultipartFile) {
         imageService.upload(id, file)

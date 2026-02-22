@@ -35,11 +35,12 @@ class AuthService(
         val user = userRepo.save(
             User(
                 email = request.email,
+                displayName = request.displayName,
                 passwordHash = passwordEncoder.encode(request.password)!!,
                 role = "USER",
             )
         )
-        return AuthResponse(generateToken(user.email))
+        return authResponseFor(user)
     }
 
     @Transactional(readOnly = true)
@@ -49,16 +50,28 @@ class AuthService(
         } catch (e: AuthenticationException) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
         }
-        return AuthResponse(generateToken(request.email))
+        val user = userRepo.findByEmail(request.email)!!
+        return authResponseFor(user)
     }
 
-    private fun generateToken(email: String): String {
+    private fun authResponseFor(user: User): AuthResponse {
+        val token = generateToken(user)
+        return AuthResponse(
+            token = token,
+            userId = user.id!!.toString(),
+            displayName = user.displayName,
+            role = user.role,
+        )
+    }
+
+    private fun generateToken(user: User): String {
         val now = Instant.now()
         val claims = JwtClaimsSet.builder()
             .issuer("board-game-collection")
             .issuedAt(now)
             .expiresAt(now.plus(1, ChronoUnit.HOURS))
-            .subject(email)
+            .subject(user.id!!.toString())
+            .claim("roles", listOf("ROLE_${user.role}"))
             .build()
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).tokenValue
     }

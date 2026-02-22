@@ -13,7 +13,7 @@ vi.mock('../../api/auth', () => ({ loginUser: vi.fn() }))
 
 vi.mock('../../store/auth', () => ({
   useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
-    selector({ token: null, setToken: vi.fn(), clearToken: vi.fn() }),
+    selector({ token: null, setAuth: vi.fn(), clearAuth: vi.fn() }),
   ),
 }))
 
@@ -46,7 +46,7 @@ describe('LoginPage', () => {
   })
 
   it('calls loginUser with entered credentials on submit', async () => {
-    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token' })
+    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Email'), 'test@example.com')
@@ -60,7 +60,7 @@ describe('LoginPage', () => {
   })
 
   it('navigates to /board-games on successful login', async () => {
-    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token' })
+    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Email'), 'test@example.com')
