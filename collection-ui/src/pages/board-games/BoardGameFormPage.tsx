@@ -154,8 +154,8 @@ export default function BoardGameFormPage() {
     setMaxPlayTime(existing.maxPlayTimeMinutes?.toString() ?? '')
     setWeight(existing.weight?.toString() ?? '')
     setRating(existing.rating?.toString() ?? '')
-    setSelectedDesigners(allDesigners.filter((d) => existing.designerIds?.includes(d.id)))
-    setSelectedPublishers(allPublishers.filter((p) => existing.publisherIds?.includes(p.id)))
+    setSelectedDesigners(allDesigners.filter((d) => existing.designerIds.includes(d.id)))
+    setSelectedPublishers(allPublishers.filter((p) => existing.publisherIds.includes(p.id)))
   }, [existing, allDesigners, allPublishers])
 
   const { mutateAsync: createGame, isPending: creating } = useCreateBoardGame()

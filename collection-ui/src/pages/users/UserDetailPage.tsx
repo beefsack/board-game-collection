@@ -54,7 +54,7 @@ export default function UserDetailPage() {
   const addableGames = allGames.filter(
     (g) =>
       !collectionIds.has(g.id) &&
-      (query === '' || g.title?.toLowerCase().includes(query.toLowerCase())),
+      (query === '' || g.title.toLowerCase().includes(query.toLowerCase())),
   )
 
   return (

@@ -54,7 +54,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [backend, frontend, manifests]
     if: github.event_name == 'push'
     permissions:
       contents: write

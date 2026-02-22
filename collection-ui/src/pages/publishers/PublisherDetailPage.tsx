@@ -45,9 +45,9 @@ export default function PublisherDetailPage() {
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>
   if (!publisher) return <p className="text-sm text-gray-500">Not found.</p>
 
-  const games = allGames.filter((g) => g.publisherIds?.includes(id!))
+  const games = allGames.filter((g) => g.publisherIds.includes(id!))
 
-  const gameLabels = games.map((g) => g.title ?? '')
+  const gameLabels = games.map((g) => g.title)
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -88,7 +88,7 @@ export default function PublisherDetailPage() {
           {isAdmin && !editing && (
             <div className="flex gap-2 shrink-0">
               <button
-                onClick={() => { setName(publisher.name ?? ''); setEditing(true) }}
+                onClick={() => { setName(publisher.name); setEditing(true) }}
                 className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Edit

@@ -33,7 +33,7 @@ export default function GameGrid({ games, ownedGameIds, variant = 'default' }: G
     'compact': 'grid grid-cols-3 sm:grid-cols-5 gap-2 max-w-2xl',
     'top-games-row': 'grid grid-cols-5 gap-2 max-w-2xl',
   }
-  const gridClass = gridClasses[variant ?? 'default']
+  const gridClass = gridClasses[variant]
 
   return (
     <ul className={gridClass}>

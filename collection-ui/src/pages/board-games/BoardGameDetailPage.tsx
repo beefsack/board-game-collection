@@ -43,8 +43,8 @@ export default function BoardGameDetailPage() {
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>
   if (!game) return <p className="text-sm text-gray-500">Not found.</p>
 
-  const gameDesigners = designers.filter((d) => game.designerIds?.includes(d.id))
-  const gamePublishers = publishers.filter((p) => game.publisherIds?.includes(p.id))
+  const gameDesigners = designers.filter((d) => game.designerIds.includes(d.id))
+  const gamePublishers = publishers.filter((p) => game.publisherIds.includes(p.id))
 
   const playTime = game.minPlayTimeMinutes != null || game.maxPlayTimeMinutes != null
     ? [game.minPlayTimeMinutes, game.maxPlayTimeMinutes].filter(Boolean).join('–') + ' min'
