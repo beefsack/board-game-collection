@@ -45,7 +45,7 @@ export default function LoginPage() {
             disabled={mutation.isPending}
             className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
           >
-            {mutation.isPending ? 'Signing in…' : 'Sign in'}
+            {mutation.isPending ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">

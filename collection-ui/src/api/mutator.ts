@@ -13,7 +13,7 @@ export const apiFetch = async <T>(
   const res = await fetch(url, {
     ...options,
     headers: {
-      // Omit Content-Type for FormData — the browser must set it automatically
+      // Omit Content-Type for FormData - the browser must set it automatically
       // to include the multipart boundary. For all other requests default to JSON.
       ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

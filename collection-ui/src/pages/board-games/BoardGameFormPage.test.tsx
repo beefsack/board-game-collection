@@ -77,7 +77,7 @@ function renderPage() {
   )
 }
 
-describe('BoardGameFormPage — create mode', () => {
+describe('BoardGameFormPage - create mode', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('renders the create form heading and required title field', () => {
@@ -95,8 +95,8 @@ describe('BoardGameFormPage — create mode', () => {
     expect(screen.getByLabelText('Max players')).toBeInTheDocument()
     expect(screen.getByLabelText('Weight')).toBeInTheDocument()
     expect(screen.getByLabelText('Rating (0–10)')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search designers…')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search publishers…')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search designers...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search publishers...')).toBeInTheDocument()
   })
 
   it('calls createBoardGame with entered data on submit', async () => {
@@ -115,7 +115,7 @@ describe('BoardGameFormPage — create mode', () => {
   it('allows selecting a designer via combobox', async () => {
     const user = userEvent.setup()
     renderPage()
-    const designerInput = screen.getByPlaceholderText('Search designers…')
+    const designerInput = screen.getByPlaceholderText('Search designers...')
     // Typing opens the Headless UI combobox dropdown in jsdom
     await user.type(designerInput, 'Uwe')
     const option = await screen.findByRole('option', { name: 'Uwe Rosenberg' })

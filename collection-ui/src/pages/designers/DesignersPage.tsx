@@ -48,7 +48,7 @@ export default function DesignersPage() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-gray-500">Loading...</p>
       ) : designers.length === 0 ? (
         <p className="text-sm text-gray-500">No designers yet.</p>
       ) : (

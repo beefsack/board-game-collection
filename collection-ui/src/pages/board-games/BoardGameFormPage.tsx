@@ -65,7 +65,7 @@ function MultiCombobox<T extends { id?: string; name?: string }>({
           <ComboboxInput
             onChange={(e) => setQuery(e.target.value)}
             displayValue={() => ''}
-            placeholder={`Search ${label.toLowerCase()}…`}
+            placeholder={`Search ${label.toLowerCase()}...`}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <ComboboxOptions className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-lg text-sm">
@@ -342,7 +342,7 @@ export default function BoardGameFormPage() {
             disabled={isPending}
             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
           >
-            {isPending ? 'Saving…' : 'Save'}
+            {isPending ? 'Saving...' : 'Save'}
           </button>
           <button
             type="button"

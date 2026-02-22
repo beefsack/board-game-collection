@@ -42,7 +42,7 @@ class SecurityConfiguration {
     fun rsaKey(): RSAKey {
         val pem = System.getenv("JWT_RSA_KEY")
         if (!pem.isNullOrBlank()) {
-            // Load stable key from Kubernetes Secret — required for multi-replica deployments.
+            // Load stable key from Kubernetes Secret - required for multi-replica deployments.
             // Generate with: openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 | base64 -w0
             // Store as: kubectl create secret generic jwt-rsa-key --from-literal=private-key="$(cat key.pem)"
             val der = Base64.getDecoder().decode(
@@ -56,7 +56,7 @@ class SecurityConfiguration {
                 .generatePublic(RSAPublicKeySpec(privateKey.modulus, privateKey.publicExponent)) as RSAPublicKey
             return RSAKey.Builder(publicKey).privateKey(privateKey).keyID("production").build()
         }
-        // Local dev: ephemeral key pair — tokens are invalidated on restart.
+        // Local dev: ephemeral key pair - tokens are invalidated on restart.
         val kp = KeyPairGenerator.getInstance("RSA").also { it.initialize(2048) }.generateKeyPair()
         return RSAKey.Builder(kp.public as RSAPublicKey)
             .privateKey(kp.private as RSAPrivateKey)

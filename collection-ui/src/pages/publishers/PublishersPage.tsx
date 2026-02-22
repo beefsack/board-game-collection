@@ -48,7 +48,7 @@ export default function PublishersPage() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-gray-500">Loading...</p>
       ) : publishers.length === 0 ? (
         <p className="text-sm text-gray-500">No publishers yet.</p>
       ) : (

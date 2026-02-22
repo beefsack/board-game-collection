@@ -57,7 +57,7 @@ export default function EntityStatsSidebar({ entityId, gameCount, gameLabels }: 
 
   return (
     <div className="space-y-5">
-      <p className="text-xs text-gray-400 italic">Demo data — live stats coming soon</p>
+      <p className="text-xs text-gray-400 italic">Demo data - live stats coming soon</p>
       <ChartSection title="Games over time">
         <MiniLineChart data={growingSeries(entityId + ':games', 18, Math.max(1, gameCount / 6))} />
       </ChartSection>

@@ -46,7 +46,7 @@ function ChartSection({ title, children }: { title: string; children: React.Reac
 export default function BoardGameStatsSidebar({ gameId }: { gameId: string }) {
   return (
     <div className="space-y-5">
-      <p className="text-xs text-gray-400 italic">Demo data — live stats coming soon</p>
+      <p className="text-xs text-gray-400 italic">Demo data - live stats coming soon</p>
       <ChartSection title="Owners over time">
         <MiniLineChart data={growingSeries(gameId + ':own', 18, 8)} />
       </ChartSection>

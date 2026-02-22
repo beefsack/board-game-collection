@@ -1,6 +1,6 @@
 export type DataPoint = { month: string; value: number }
 
-// Xorshift PRNG seeded from a string — stable across renders for the same seed.
+// Xorshift PRNG seeded from a string - stable across renders for the same seed.
 function makeRand(seed: string): () => number {
   let h = 2166136261
   for (let i = 0; i < seed.length; i++) {

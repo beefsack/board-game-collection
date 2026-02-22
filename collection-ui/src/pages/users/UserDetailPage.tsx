@@ -45,7 +45,7 @@ export default function UserDetailPage() {
     },
   })
 
-  if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>
+  if (isLoading) return <p className="text-sm text-gray-500">Loading...</p>
   if (!data?.user) return <p className="text-sm text-gray-500">Not found.</p>
 
   const { user, collection = [] } = data
@@ -91,7 +91,7 @@ export default function UserDetailPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               displayValue={() => query}
-              placeholder="Add a game to your collection…"
+              placeholder="Add a game to your collection..."
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <ComboboxOptions className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-lg text-sm">

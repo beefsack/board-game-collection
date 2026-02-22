@@ -12,7 +12,7 @@ export default function UsersPage() {
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Collections</h1>
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-gray-500">Loading...</p>
       ) : sorted.length === 0 ? (
         <p className="text-sm text-gray-500">No users yet.</p>
       ) : (

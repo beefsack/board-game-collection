@@ -42,7 +42,7 @@ export default function PublisherDetailPage() {
     },
   })
 
-  if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>
+  if (isLoading) return <p className="text-sm text-gray-500">Loading...</p>
   if (!publisher) return <p className="text-sm text-gray-500">Not found.</p>
 
   const games = allGames.filter((g) => g.publisherIds.includes(id!))

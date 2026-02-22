@@ -22,7 +22,7 @@ export default function BoardGamesPage() {
           </Link>
         )}
       </div>
-      {isLoading ? <p className="text-sm text-gray-500">Loading…</p> : <GameGrid games={games} ownedGameIds={ownedGameIds} />}
+      {isLoading ? <p className="text-sm text-gray-500">Loading...</p> : <GameGrid games={games} ownedGameIds={ownedGameIds} />}
     </div>
   )
 }

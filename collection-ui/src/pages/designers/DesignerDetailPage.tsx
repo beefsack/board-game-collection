@@ -42,7 +42,7 @@ export default function DesignerDetailPage() {
     },
   })
 
-  if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>
+  if (isLoading) return <p className="text-sm text-gray-500">Loading...</p>
   if (!designer) return <p className="text-sm text-gray-500">Not found.</p>
 
   const games = allGames.filter((g) => g.designerIds.includes(id!))
@@ -52,7 +52,7 @@ export default function DesignerDetailPage() {
   return (
     <div className="flex flex-col lg:flex-row gap-8 items-start">
       <div className="flex-1 min-w-0 max-w-2xl">
-      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
         {editing ? (
           <form
             onSubmit={(e) => {
@@ -103,14 +103,14 @@ export default function DesignerDetailPage() {
             </button>
           </div>
         )}
-      </div>
+        </div>
 
-      {games.length > 0 && (
-        <section>
-          <h2 className="text-sm font-medium text-gray-500 mb-3">Games</h2>
-          <GameGrid games={games} ownedGameIds={ownedGameIds} />
-        </section>
-      )}
+        {games.length > 0 && (
+          <section>
+            <h2 className="text-sm font-medium text-gray-500 mb-3">Games</h2>
+            <GameGrid games={games} ownedGameIds={ownedGameIds} />
+          </section>
+        )}
       </div>
 
       <div className="w-full lg:w-72 shrink-0">
