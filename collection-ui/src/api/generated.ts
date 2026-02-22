@@ -103,6 +103,8 @@ export interface UserBoardGame {
 
 export interface RegisterRequest {
   /** @minLength 1 */
+  displayName: string;
+  /** @minLength 1 */
   email: string;
   /**
    * @minLength 8
@@ -113,6 +115,9 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token?: string;
+  userId?: string;
+  displayName?: string;
+  role?: string;
 }
 
 export interface LoginRequest {
@@ -122,17 +127,15 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface User {
+export interface UserResponse {
   id?: string;
   email?: string;
-  passwordHash?: string;
+  displayName?: string;
   role?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface UserCollectionResponse {
-  user?: User;
+  user?: UserResponse;
   collection?: BoardGame[];
 }
 
@@ -1559,9 +1562,9 @@ export const getListUsersUrl = () => {
   return `/api/users`
 }
 
-export const listUsers = async ( options?: RequestInit): Promise<User[]> => {
+export const listUsers = async ( options?: RequestInit): Promise<UserResponse[]> => {
   
-  return apiFetch<User[]>(getListUsersUrl(),
+  return apiFetch<UserResponse[]>(getListUsersUrl(),
   {      
     ...options,
     method: 'GET'
