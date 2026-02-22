@@ -7,6 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:8080',
+      '/images': {
+        target: 'http://localhost:9000',
+        rewrite: (path) => path.replace(/^\/images/, ''),
+      },
     },
   },
 })

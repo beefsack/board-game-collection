@@ -76,6 +76,7 @@ export interface BoardGame {
   maxPlayers?: number;
   playTimeMinutes?: number;
   weight?: number;
+  hasImage?: boolean;
   designers?: BoardGameDesigner[];
   publishers?: BoardGamePublisher[];
   createdAt?: string;
@@ -130,6 +131,10 @@ export interface UserCollectionResponse {
   user?: User;
   collection?: BoardGame[];
 }
+
+export type UploadBoardGameImageBody = {
+  file: Blob;
+};
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -1342,6 +1347,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCreateBoardGameMutationOptions(options), queryClient);
+    }
+    
+export const getUploadBoardGameImageUrl = (id: string,) => {
+
+
+  
+
+  return `/api/board-games/${id}/image`
+}
+
+export const uploadBoardGameImage = async (id: string,
+    uploadBoardGameImageBody: UploadBoardGameImageBody, options?: RequestInit): Promise<void> => {
+    const formData = new FormData();
+formData.append(`file`, uploadBoardGameImageBody.file);
+
+  return apiFetch<void>(getUploadBoardGameImageUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+  
+
+
+
+export const getUploadBoardGameImageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadBoardGameImage>>, TError,{id: string;data: UploadBoardGameImageBody}, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadBoardGameImage>>, TError,{id: string;data: UploadBoardGameImageBody}, TContext> => {
+
+const mutationKey = ['uploadBoardGameImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadBoardGameImage>>, {id: string;data: UploadBoardGameImageBody}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  uploadBoardGameImage(id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadBoardGameImageMutationResult = NonNullable<Awaited<ReturnType<typeof uploadBoardGameImage>>>
+    export type UploadBoardGameImageMutationBody = UploadBoardGameImageBody
+    export type UploadBoardGameImageMutationError = unknown
+
+    export const useUploadBoardGameImage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadBoardGameImage>>, TError,{id: string;data: UploadBoardGameImageBody}, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadBoardGameImage>>,
+        TError,
+        {id: string;data: UploadBoardGameImageBody},
+        TContext
+      > => {
+      return useMutation(getUploadBoardGameImageMutationOptions(options), queryClient);
     }
     
 export const getRegisterUrl = () => {

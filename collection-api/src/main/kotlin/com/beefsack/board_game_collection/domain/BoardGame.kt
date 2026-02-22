@@ -18,6 +18,7 @@ data class BoardGame(
     val maxPlayers: Int?,
     val playTimeMinutes: Int?,
     val weight: BigDecimal?,
+    val hasImage: Boolean = false,
     @MappedCollection(idColumn = "board_game_id") val designers: Set<BoardGameDesigner> = emptySet(),
     @MappedCollection(idColumn = "board_game_id") val publishers: Set<BoardGamePublisher> = emptySet(),
     @CreatedDate val createdAt: Instant? = null,

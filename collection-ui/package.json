@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "npm run generate && vite",
+    "build": "orval && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate": "orval",
+    "generate": "curl -sf http://localhost:8080/v3/api-docs -o openapi.json && orval",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"

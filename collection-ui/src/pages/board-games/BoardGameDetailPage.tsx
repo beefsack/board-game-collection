@@ -45,6 +45,10 @@ export default function BoardGameDetailPage() {
 
   return (
     <div className="max-w-2xl">
+      {game.hasImage && (
+        <img src={`/images/board-games/${id}`} alt="" className="rounded-xl max-w-full mb-6" />
+      )}
+
       <div className="flex items-start justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{game.title}</h1>
         <div className="flex gap-2 shrink-0 ml-4">

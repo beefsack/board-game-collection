@@ -15,7 +15,11 @@ export default function GameGrid({ games }: GameGridProps) {
       {games.map((game) => (
         <li key={game.id}>
           <Link to={`/board-games/${game.id}`} className="group block">
-            <div className="aspect-square rounded-lg bg-gray-100 mb-2" />
+            <div className="aspect-square rounded-lg bg-gray-100 mb-2 overflow-hidden">
+              {game.hasImage && (
+                <img src={`/images/board-games/${game.id}`} alt="" className="h-full w-full object-cover" />
+              )}
+            </div>
             <p className="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
               {game.title}
             </p>

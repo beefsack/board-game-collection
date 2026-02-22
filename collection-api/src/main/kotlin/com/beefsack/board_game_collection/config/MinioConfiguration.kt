@@ -11,6 +11,10 @@ import software.amazon.awssdk.services.s3.S3Configuration as AwsS3Configuration
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException
 import java.net.URI
 
+private fun publicReadPolicy(bucket: String) = """
+    {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::$bucket/*"]}]}
+""".trimIndent()
+
 @Configuration
 class MinioConfiguration(
     @Value("\${app.minio.endpoint}") private val endpoint: String,
@@ -31,6 +35,7 @@ class MinioConfiguration(
         } catch (_: NoSuchBucketException) {
             client.createBucket { it.bucket(bucket) }
         }
+        client.putBucketPolicy { it.bucket(bucket).policy(publicReadPolicy(bucket)) }
         return client
     }
 }

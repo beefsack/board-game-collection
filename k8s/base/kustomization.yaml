@@ -13,4 +13,5 @@ resources:
   - postgres/service.yaml
   - minio/statefulset.yaml
   - minio/service.yaml
+  - minio/ingress.yaml
   - ingress.yaml

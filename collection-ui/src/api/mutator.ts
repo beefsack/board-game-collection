@@ -13,11 +13,14 @@ export const apiFetch = async <T>(
   const res = await fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      // Omit Content-Type for FormData — the browser must set it automatically
+      // to include the multipart boundary. For all other requests default to JSON.
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   })
+  if (res.status === 401) useAuthStore.getState().clearToken()
   if (!res.ok) throw new ApiError(res.statusText, res.status)
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>

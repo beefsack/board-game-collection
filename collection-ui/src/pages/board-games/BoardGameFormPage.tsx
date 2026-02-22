@@ -6,6 +6,9 @@ import {
   useGetBoardGame,
   useCreateBoardGame,
   useUpdateBoardGame,
+  useUploadBoardGameImage,
+  useCreateDesigner,
+  useCreatePublisher,
   useListDesigners,
   useListPublishers,
   type Designer,
@@ -17,46 +20,81 @@ function MultiCombobox<T extends { id?: string; name?: string }>({
   items,
   selected,
   onChange,
+  onCreate,
 }: {
   label: string
   items: T[]
   selected: T[]
   onChange: (v: T[]) => void
+  onCreate?: (name: string) => Promise<T>
 }) {
   const [query, setQuery] = useState('')
-  const filtered =
-    query === ''
-      ? items
-      : items.filter((i) => i.name?.toLowerCase().includes(query.toLowerCase()))
+  const [creating, setCreating] = useState(false)
+
+  const trimmed = query.trim()
+  const filtered = items.filter(
+    (i) =>
+      !selected.some((s) => s.id === i.id) &&
+      (query === '' || i.name?.toLowerCase().includes(query.toLowerCase())),
+  )
+  const showCreate =
+    !!onCreate &&
+    trimmed !== '' &&
+    !items.some((i) => i.name?.toLowerCase() === trimmed.toLowerCase())
+
+  const handleChange = async (item: T | null) => {
+    if (!item) return
+    if (item.id === '__create__') {
+      setCreating(true)
+      try {
+        const created = await onCreate!(trimmed)
+        onChange([...selected, created])
+      } finally {
+        setCreating(false)
+      }
+    } else {
+      onChange([...selected, item])
+    }
+  }
 
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <Combobox value={selected} onChange={onChange} multiple>
+      <Combobox value={null} onChange={handleChange} disabled={creating} onClose={() => setQuery('')}>
         <div className="relative">
           <ComboboxInput
             onChange={(e) => setQuery(e.target.value)}
-            displayValue={(items: T[]) => items.map((i) => i.name).join(', ')}
+            displayValue={() => ''}
             placeholder={`Search ${label.toLowerCase()}…`}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <ComboboxOptions className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-lg text-sm">
-            {filtered.length === 0 ? (
+            {filtered.length === 0 && !showCreate ? (
               <div className="px-3 py-2 text-gray-400">No results</div>
             ) : (
-              filtered.map((item) => (
-                <ComboboxOption
-                  key={item.id}
-                  value={item}
-                  className={({ focus }) =>
-                    `cursor-pointer px-3 py-2 ${focus ? 'bg-indigo-50 text-indigo-700' : 'text-gray-900'}`
-                  }
-                >
-                  {({ selected }) => (
-                    <span className={selected ? 'font-medium' : ''}>{item.name}</span>
-                  )}
-                </ComboboxOption>
-              ))
+              <>
+                {filtered.map((item) => (
+                  <ComboboxOption
+                    key={item.id}
+                    value={item}
+                    className={({ focus }) =>
+                      `cursor-pointer px-3 py-2 ${focus ? 'bg-indigo-50 text-indigo-700' : 'text-gray-900'}`
+                    }
+                  >
+                    {item.name}
+                  </ComboboxOption>
+                ))}
+                {showCreate && (
+                  <ComboboxOption
+                    value={{ id: '__create__', name: trimmed } as unknown as T}
+                    className={({ focus }) =>
+                      `cursor-pointer px-3 py-2 italic ${focus ? 'bg-indigo-50 text-indigo-700' : 'text-gray-500'}`
+                    }
+                  >
+                    Create "{trimmed}"
+                  </ComboboxOption>
+                )}
+              </>
             )}
           </ComboboxOptions>
         </div>
@@ -102,6 +140,7 @@ export default function BoardGameFormPage() {
   const [weight, setWeight] = useState('')
   const [selectedDesigners, setSelectedDesigners] = useState<Designer[]>([])
   const [selectedPublishers, setSelectedPublishers] = useState<Publisher[]>([])
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (!existing) return
@@ -119,27 +158,15 @@ export default function BoardGameFormPage() {
     )
   }, [existing, allDesigners, allPublishers])
 
-  const { mutate: createGame, isPending: creating } = useCreateBoardGame({
-    mutation: {
-      onSuccess: (game) => {
-        qc.invalidateQueries({ queryKey: ['/api/board-games'] })
-        navigate(`/board-games/${game.id}`)
-      },
-    },
-  })
+  const { mutateAsync: createGame, isPending: creating } = useCreateBoardGame()
+  const { mutateAsync: updateGame, isPending: updating } = useUpdateBoardGame()
+  const { mutateAsync: uploadImage, isPending: uploading } = useUploadBoardGameImage()
+  const { mutateAsync: createDesigner } = useCreateDesigner()
+  const { mutateAsync: createPublisher } = useCreatePublisher()
 
-  const { mutate: updateGame, isPending: updating } = useUpdateBoardGame({
-    mutation: {
-      onSuccess: () => {
-        qc.invalidateQueries({ queryKey: ['/api/board-games'] })
-        navigate(`/board-games/${id}`)
-      },
-    },
-  })
+  const isPending = creating || updating || uploading
 
-  const isPending = creating || updating
-
-  const handleSubmit = (e: { preventDefault(): void }) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     const data = {
       title,
@@ -151,11 +178,14 @@ export default function BoardGameFormPage() {
       designerIds: selectedDesigners.map((d) => d.id!),
       publisherIds: selectedPublishers.map((p) => p.id!),
     }
-    if (isEdit) {
-      updateGame({ id: id!, data })
-    } else {
-      createGame({ data })
+    const gameId = isEdit
+      ? (await updateGame({ id: id!, data }), id!)
+      : (await createGame({ data })).id!
+    if (imageFile) {
+      await uploadImage({ id: gameId, data: { file: imageFile } })
     }
+    qc.invalidateQueries({ queryKey: ['/api/board-games'] })
+    navigate(`/board-games/${gameId}`)
   }
 
   const fieldClass =
@@ -249,6 +279,11 @@ export default function BoardGameFormPage() {
           items={allDesigners}
           selected={selectedDesigners}
           onChange={setSelectedDesigners}
+          onCreate={async (name) => {
+            const designer = await createDesigner({ data: { name } })
+            qc.invalidateQueries({ queryKey: ['/api/designers'] })
+            return designer
+          }}
         />
 
         <MultiCombobox<Publisher>
@@ -256,7 +291,25 @@ export default function BoardGameFormPage() {
           items={allPublishers}
           selected={selectedPublishers}
           onChange={setSelectedPublishers}
+          onCreate={async (name) => {
+            const publisher = await createPublisher({ data: { name } })
+            qc.invalidateQueries({ queryKey: ['/api/publishers'] })
+            return publisher
+          }}
         />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          {isEdit && existing?.hasImage && (
+            <img src={`/images/board-games/${id}`} alt="" className="h-32 w-32 object-cover rounded mb-2" />
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+            className="text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 file:cursor-pointer"
+          />
+        </div>
 
         <div className="flex gap-3 pt-2">
           <button

@@ -277,5 +277,69 @@ To further demonstrate breadth of skill, the following enhancements are planned 
 
 * **No new dependencies required** — `@EnableMethodSecurity` and `@PreAuthorize` are part of `spring-boot-starter-security`, already on the classpath.
 
+* **Restrict image upload** (`POST /api/board-games/{id}/image`) to `ADMIN` only using the same `@PreAuthorize("hasRole('ADMIN')")` annotation. This also addresses the image upload security concern: by limiting who can upload, the attack surface is reduced to trusted users, making magic-byte content validation unnecessary for this project.
+
 * **Promote a user to admin** via a direct SQL update (no admin UI needed initially):
   `UPDATE users SET role = 'ADMIN' WHERE email = 'you@example.com';`
+
+---
+
+## **10\. Out of Scope: Known Production Gaps**
+
+This section documents deliberate shortcuts taken to keep the project focused as a portfolio piece. Each item describes what was omitted, what a full production implementation would require, and why it was descoped.
+
+### **10.1. JWT Refresh Tokens**
+
+**Gap:** The API issues short-lived access tokens (1-hour expiry) with no refresh mechanism. When a token expires, the client receives a 401, clears the stored token, and redirects the user to the login page.
+
+**Production requirement:** A refresh token system — a long-lived, opaque token stored server-side (in a `refresh_tokens` table or Redis), issued alongside the access token, and exchanged for a new access token without re-authentication. Refresh tokens require rotation on use, revocation endpoints (logout, "sign out all devices"), and coordinated expiry logic on the client.
+
+**Why descoped:** The implementation surface is large and spans both the backend (new table, new endpoints, revocation logic) and the frontend (silent refresh flow, retry-after-refresh interceptor). The complexity is disproportionate to the value in a single-user portfolio demo with a 1-hour access window.
+
+### **10.2. Auth Rate Limiting & Brute-Force Protection**
+
+**Gap:** The `/api/auth/login` and `/api/auth/register` endpoints have no rate limiting. A client can make unlimited requests without restriction.
+
+**Production requirement:** Rate limiting on authentication endpoints to prevent credential stuffing and brute-force attacks. Options include nginx/ingress-level rate limiting (`limit_req`), a Spring filter backed by a distributed counter (e.g. `bucket4j` with Redis), or a WAF in front of the cluster.
+
+**Why descoped:** Requires either a distributed counter (adding Redis as another stateful dependency) or ingress-level configuration work that adds operational complexity without meaningfully demonstrating additional engineering skill for this project.
+
+### **10.3. Image Delivery via CDN**
+
+**Gap:** Board game images are proxied through the API pods on every request (`GET /api/board-games/{id}/image` reads from MinIO and returns the bytes). This routes all image traffic through the application tier.
+
+**Production requirement:** Images should be served directly from a CDN or from object storage with a public endpoint, bypassing the API pods entirely. This eliminates unnecessary bandwidth and CPU load on application pods and provides global edge caching.
+
+**Why descoped:** Requires either exposing MinIO publicly through the ingress (and managing a public bucket policy) or integrating a CDN provider — both add infrastructure complexity without demonstrating additional application engineering skill.
+
+### **10.4. Kubernetes Pod Resource Requests & Limits**
+
+**Gap:** No CPU or memory `requests`/`limits` are defined on any pod. Pods are unconstrained and rely on the cluster scheduler's best-effort placement.
+
+**Production requirement:** All pods should declare `resources.requests` (for scheduling) and `resources.limits` (for isolation). Without limits, a misbehaving pod can starve other workloads on the same node. Requests are also required for the Horizontal Pod Autoscaler to function.
+
+**Why descoped:** Setting accurate values requires profiling under realistic load. On this 3-node personal cluster the current memory headroom is sufficient, and adding speculative limits without profiling data risks incorrect throttling.
+
+### **10.5. Structured Logging & Observability**
+
+**Gap:** The application emits unstructured log lines to stdout with no log aggregation, no metrics collection, and no distributed tracing.
+
+**Production requirement:** Structured JSON logging (Logback with `logstash-logback-encoder`), a metrics pipeline (Micrometer → Prometheus → Grafana), and distributed tracing (OpenTelemetry). These are essential for diagnosing latency, errors, and resource usage in production.
+
+**Why descoped:** Each of these is a substantial integration in its own right. The project already demonstrates CI/CD, Kubernetes, and GitOps; adding a full observability stack would expand scope significantly without adding to the core portfolio narrative.
+
+### **10.6. Admin Promotion via Direct SQL**
+
+**Gap:** Elevating a user to the `ADMIN` role requires running a raw SQL statement directly against the production database (`UPDATE users SET role = 'ADMIN' ...`). There is no privileged management interface.
+
+**Production requirement:** A secure out-of-band mechanism for privilege escalation — either a protected admin API endpoint, a CLI tool that runs with elevated database credentials, or a seed/migration-based bootstrap for the initial admin user.
+
+**Why descoped:** The RBAC feature itself (Phase 6, section 9.3) is not yet implemented. The promotion mechanism is a follow-on to that work and is deliberately simple for now.
+
+### **10.7. Image Processing (Resizing & Thumbnails)**
+
+**Gap:** Images are stored and served at their original resolution. There is no server-side resizing, thumbnail generation, or format normalisation.
+
+**Production requirement:** An image processing pipeline (e.g. ImageMagick, Sharp, or a managed service like Imgix/Cloudinary) that produces multiple resolutions — at minimum a thumbnail for grid views and a display-size variant for detail views. Serving full-resolution originals as grid thumbnails wastes bandwidth and degrades page load performance at scale.
+
+**Why descoped:** Image processing adds a non-trivial dependency (a native library or third-party service) and a more complex upload flow. For a portfolio demo with a small number of games, the performance impact is negligible.

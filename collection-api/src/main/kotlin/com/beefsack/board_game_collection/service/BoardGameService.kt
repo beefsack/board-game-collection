@@ -39,6 +39,8 @@ class BoardGameService(private val repo: BoardGameRepository) {
 
     fun delete(id: UUID) = repo.deleteById(id)
 
+    fun markHasImage(id: UUID) = repo.save(findById(id).copy(hasImage = true))
+
     private fun BoardGameRequest.toBoardGame() = BoardGame(
         title = title,
         yearPublished = yearPublished,

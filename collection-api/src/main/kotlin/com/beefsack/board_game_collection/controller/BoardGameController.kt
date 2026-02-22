@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -48,13 +47,8 @@ class BoardGameController(
     @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(operationId = "uploadBoardGameImage")
-    fun uploadImage(@PathVariable id: UUID, @RequestParam("file") file: MultipartFile) =
+    fun uploadImage(@PathVariable id: UUID, @RequestParam("file") file: MultipartFile) {
         imageService.upload(id, file)
-
-    @GetMapping("/{id}/image", produces = [MediaType.IMAGE_JPEG_VALUE])
-    @Operation(operationId = "getBoardGameImage")
-    fun getImage(@PathVariable id: UUID): ResponseEntity<ByteArray> =
-        ResponseEntity.ok()
-            .contentType(MediaType.IMAGE_JPEG)
-            .body(imageService.download(id))
+        service.markHasImage(id)
+    }
 }
