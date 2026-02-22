@@ -1,9 +1,10 @@
 package com.beefsack.board_game_collection.service
 
-import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.Designer
+import com.beefsack.board_game_collection.dto.BoardGameResponse
 import com.beefsack.board_game_collection.dto.DesignerRequest
 import com.beefsack.board_game_collection.dto.DesignerResponse
+import com.beefsack.board_game_collection.dto.toResponse
 import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.DesignerRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -26,7 +27,7 @@ class DesignerService(
         val topMappings = repo.findTopGameMappingsPerDesigner()
         val gamesById = boardGameRepo.findAllById(topMappings.map { it.boardGameId }.toSet()).associateBy { it.id!! }
         val topGamesPerDesigner = topMappings.groupBy { it.entityId }
-            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId] } }
+            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId]?.toResponse() } }
         return repo.findAll().map {
             it.toResponse(counts[it.id] ?: 0, topGamesPerDesigner[it.id] ?: emptyList())
         }
@@ -50,8 +51,8 @@ class DesignerService(
 
     fun delete(id: UUID) = repo.deleteById(id)
 
-    private fun Designer.toResponse(gameCount: Int, topGames: List<BoardGame> = emptyList()) = DesignerResponse(
-        id = id,
+    private fun Designer.toResponse(gameCount: Int, topGames: List<BoardGameResponse> = emptyList()) = DesignerResponse(
+        id = id!!,
         name = name,
         gameCount = gameCount,
         topGames = topGames,

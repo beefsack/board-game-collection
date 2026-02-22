@@ -46,8 +46,8 @@ const mockGame = {
   maxPlayers: 5,
   minPlayTimeMinutes: 70,
   weight: 2.4,
-  designers: [{ designerId: 'designer-1' }],
-  publishers: [{ publisherId: 'publisher-1' }],
+  designerIds: ['designer-1'],
+  publisherIds: ['publisher-1'],
 }
 
 function renderPage() {

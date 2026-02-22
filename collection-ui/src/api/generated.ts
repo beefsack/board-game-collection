@@ -29,17 +29,9 @@ export interface PublisherRequest {
   name: string;
 }
 
-export interface BoardGameDesigner {
-  designerId?: string;
-}
-
-export interface BoardGamePublisher {
-  publisherId?: string;
-}
-
 export interface BoardGame {
-  id?: string;
-  title?: string;
+  id: string;
+  title: string;
   yearPublished?: number;
   minPlayers?: number;
   maxPlayers?: number;
@@ -47,18 +39,18 @@ export interface BoardGame {
   maxPlayTimeMinutes?: number;
   weight?: number;
   rating?: number;
-  hasImage?: boolean;
-  designers?: BoardGameDesigner[];
-  publishers?: BoardGamePublisher[];
-  createdAt?: string;
-  updatedAt?: string;
+  hasImage: boolean;
+  designerIds: string[];
+  publisherIds: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PublisherResponse {
-  id?: string;
-  name?: string;
-  gameCount?: number;
-  topGames?: BoardGame[];
+  id: string;
+  name: string;
+  gameCount: number;
+  topGames: BoardGame[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -69,10 +61,10 @@ export interface DesignerRequest {
 }
 
 export interface DesignerResponse {
-  id?: string;
-  name?: string;
-  gameCount?: number;
-  topGames?: BoardGame[];
+  id: string;
+  name: string;
+  gameCount: number;
+  topGames: BoardGame[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -112,16 +104,16 @@ export interface RegisterRequest {
   email: string;
   /**
    * @minLength 8
-   * @maxLength 2147483647
+   * @maxLength 72
    */
   password: string;
 }
 
 export interface AuthResponse {
-  token?: string;
-  userId?: string;
-  displayName?: string;
-  role?: string;
+  token: string;
+  userId: string;
+  displayName: string;
+  role: string;
 }
 
 export interface LoginRequest {
@@ -132,17 +124,17 @@ export interface LoginRequest {
 }
 
 export interface UserResponse {
-  id?: string;
-  email?: string;
-  displayName?: string;
-  role?: string;
-  gameCount?: number;
-  topGames?: BoardGame[];
+  id: string;
+  email: string;
+  displayName: string;
+  role: string;
+  gameCount: number;
+  topGames: BoardGame[];
 }
 
 export interface UserCollectionResponse {
-  user?: UserResponse;
-  collection?: BoardGame[];
+  user: UserResponse;
+  collection: BoardGame[];
 }
 
 export type UploadBoardGameImageBody = {

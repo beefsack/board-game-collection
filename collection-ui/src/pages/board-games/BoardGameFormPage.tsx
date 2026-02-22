@@ -154,12 +154,8 @@ export default function BoardGameFormPage() {
     setMaxPlayTime(existing.maxPlayTimeMinutes?.toString() ?? '')
     setWeight(existing.weight?.toString() ?? '')
     setRating(existing.rating?.toString() ?? '')
-    setSelectedDesigners(
-      allDesigners.filter((d) => existing.designers?.some((gd) => gd.designerId === d.id)),
-    )
-    setSelectedPublishers(
-      allPublishers.filter((p) => existing.publishers?.some((gp) => gp.publisherId === p.id)),
-    )
+    setSelectedDesigners(allDesigners.filter((d) => existing.designerIds?.includes(d.id)))
+    setSelectedPublishers(allPublishers.filter((p) => existing.publisherIds?.includes(p.id)))
   }, [existing, allDesigners, allPublishers])
 
   const { mutateAsync: createGame, isPending: creating } = useCreateBoardGame()
@@ -181,12 +177,12 @@ export default function BoardGameFormPage() {
       maxPlayTimeMinutes: maxPlayTime ? parseInt(maxPlayTime) : undefined,
       weight: weight ? parseFloat(weight) : undefined,
       rating: rating ? parseFloat(rating) : undefined,
-      designerIds: selectedDesigners.map((d) => d.id!),
-      publisherIds: selectedPublishers.map((p) => p.id!),
+      designerIds: selectedDesigners.map((d) => d.id),
+      publisherIds: selectedPublishers.map((p) => p.id),
     }
     const gameId = isEdit
       ? (await updateGame({ id: id!, data }), id!)
-      : (await createGame({ data })).id!
+      : (await createGame({ data })).id
     if (imageFile) {
       await uploadImage({ id: gameId, data: { file: imageFile } })
     }

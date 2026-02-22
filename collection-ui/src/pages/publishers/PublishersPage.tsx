@@ -67,8 +67,8 @@ export default function PublishersPage() {
                 </div>
                 <Link to={`/publishers/${p.id}`} className="text-gray-300">›</Link>
               </div>
-              {(p.topGames ?? []).length > 0 && (
-                <GameGrid games={p.topGames!} variant="top-games-row" />
+              {p.topGames.length > 0 && (
+                <GameGrid games={p.topGames} variant="top-games-row" />
               )}
             </div>
           ))}

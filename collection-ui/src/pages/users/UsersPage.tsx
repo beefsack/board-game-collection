@@ -31,8 +31,8 @@ export default function UsersPage() {
                 </div>
                 <Link to={`/users/${u.id}`} className="text-gray-300">›</Link>
               </div>
-              {(u.topGames ?? []).length > 0 && (
-                <GameGrid games={u.topGames!} variant="top-games-row" />
+              {u.topGames.length > 0 && (
+                <GameGrid games={u.topGames} variant="top-games-row" />
               )}
             </div>
           ))}

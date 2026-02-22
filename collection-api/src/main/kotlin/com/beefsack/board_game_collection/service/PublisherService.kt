@@ -1,9 +1,10 @@
 package com.beefsack.board_game_collection.service
 
-import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.Publisher
+import com.beefsack.board_game_collection.dto.BoardGameResponse
 import com.beefsack.board_game_collection.dto.PublisherRequest
 import com.beefsack.board_game_collection.dto.PublisherResponse
+import com.beefsack.board_game_collection.dto.toResponse
 import com.beefsack.board_game_collection.repository.BoardGameRepository
 import com.beefsack.board_game_collection.repository.PublisherRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -26,7 +27,7 @@ class PublisherService(
         val topMappings = repo.findTopGameMappingsPerPublisher()
         val gamesById = boardGameRepo.findAllById(topMappings.map { it.boardGameId }.toSet()).associateBy { it.id!! }
         val topGamesPerPublisher = topMappings.groupBy { it.entityId }
-            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId] } }
+            .mapValues { (_, ms) -> ms.mapNotNull { gamesById[it.boardGameId]?.toResponse() } }
         return repo.findAll().map {
             it.toResponse(counts[it.id] ?: 0, topGamesPerPublisher[it.id] ?: emptyList())
         }
@@ -50,8 +51,8 @@ class PublisherService(
 
     fun delete(id: UUID) = repo.deleteById(id)
 
-    private fun Publisher.toResponse(gameCount: Int, topGames: List<BoardGame> = emptyList()) = PublisherResponse(
-        id = id,
+    private fun Publisher.toResponse(gameCount: Int, topGames: List<BoardGameResponse> = emptyList()) = PublisherResponse(
+        id = id!!,
         name = name,
         gameCount = gameCount,
         topGames = topGames,

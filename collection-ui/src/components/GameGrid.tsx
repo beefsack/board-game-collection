@@ -46,7 +46,7 @@ export default function GameGrid({ games, ownedGameIds, variant = 'default' }: G
                 {game.hasImage && (
                   <img src={`/images/board-games/${game.id}`} alt="" className="h-full w-full object-cover" />
                 )}
-                {ownedGameIds?.has(game.id!) && (
+                {ownedGameIds?.has(game.id) && (
                   <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white text-xs font-bold">
                     ✓
                   </span>

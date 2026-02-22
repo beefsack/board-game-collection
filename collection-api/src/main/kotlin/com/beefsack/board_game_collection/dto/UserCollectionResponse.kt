@@ -1,5 +1,8 @@
 package com.beefsack.board_game_collection.dto
 
-import com.beefsack.board_game_collection.domain.BoardGame
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class UserCollectionResponse(val user: UserResponse, val collection: List<BoardGame>)
+data class UserCollectionResponse(
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val user: UserResponse,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val collection: List<BoardGameResponse>,
+)

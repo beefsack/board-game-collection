@@ -4,6 +4,8 @@ import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.domain.BoardGameDesigner
 import com.beefsack.board_game_collection.domain.BoardGamePublisher
 import com.beefsack.board_game_collection.dto.BoardGameRequest
+import com.beefsack.board_game_collection.dto.BoardGameResponse
+import com.beefsack.board_game_collection.dto.toResponse
 import com.beefsack.board_game_collection.repository.BoardGameRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -17,16 +19,16 @@ import java.util.UUID
 class BoardGameService(private val repo: BoardGameRepository) {
 
     @Transactional(readOnly = true)
-    fun findAll(): List<BoardGame> = repo.findAll()
+    fun findAll(): List<BoardGameResponse> = repo.findAll().map { it.toResponse() }
 
     @Transactional(readOnly = true)
-    fun findById(id: UUID): BoardGame =
-        repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun findById(id: UUID): BoardGameResponse =
+        (repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)).toResponse()
 
-    fun create(request: BoardGameRequest): BoardGame = repo.save(request.toBoardGame())
+    fun create(request: BoardGameRequest): BoardGameResponse = repo.save(request.toBoardGame()).toResponse()
 
-    fun update(id: UUID, request: BoardGameRequest): BoardGame =
-        repo.save(findById(id).copy(
+    fun update(id: UUID, request: BoardGameRequest): BoardGameResponse =
+        repo.save((repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)).copy(
             title = request.title,
             yearPublished = request.yearPublished,
             minPlayers = request.minPlayers,
@@ -37,11 +39,12 @@ class BoardGameService(private val repo: BoardGameRepository) {
             rating = request.rating,
             designers = request.designerIds.map { BoardGameDesigner(it) }.toSet(),
             publishers = request.publisherIds.map { BoardGamePublisher(it) }.toSet(),
-        ))
+        )).toResponse()
 
     fun delete(id: UUID) = repo.deleteById(id)
 
-    fun markHasImage(id: UUID) = repo.save(findById(id).copy(hasImage = true))
+    fun markHasImage(id: UUID) =
+        repo.save((repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)).copy(hasImage = true))
 
     private fun BoardGameRequest.toBoardGame() = BoardGame(
         title = title,

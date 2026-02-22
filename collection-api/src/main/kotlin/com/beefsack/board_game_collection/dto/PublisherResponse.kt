@@ -1,14 +1,14 @@
 package com.beefsack.board_game_collection.dto
 
-import com.beefsack.board_game_collection.domain.BoardGame
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 import java.util.UUID
 
 data class PublisherResponse(
-    val id: UUID?,
-    val name: String?,
-    val gameCount: Int = 0,
-    val topGames: List<BoardGame> = emptyList(),
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val id: UUID,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val name: String,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val gameCount: Int = 0,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val topGames: List<BoardGameResponse> = emptyList(),
     val createdAt: Instant?,
     val updatedAt: Instant?,
 )

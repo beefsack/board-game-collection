@@ -50,10 +50,10 @@ export default function UserDetailPage() {
 
   const { user, collection = [] } = data
 
-  const collectionIds = new Set(collection.map((g) => g.id!))
+  const collectionIds = new Set(collection.map((g) => g.id))
   const addableGames = allGames.filter(
     (g) =>
-      !collectionIds.has(g.id!) &&
+      !collectionIds.has(g.id) &&
       (query === '' || g.title?.toLowerCase().includes(query.toLowerCase())),
   )
 

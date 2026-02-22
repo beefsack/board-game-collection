@@ -1,7 +1,7 @@
 package com.beefsack.board_game_collection.controller
 
-import com.beefsack.board_game_collection.domain.BoardGame
 import com.beefsack.board_game_collection.dto.BoardGameRequest
+import com.beefsack.board_game_collection.dto.BoardGameResponse
 import com.beefsack.board_game_collection.service.BoardGameService
 import com.beefsack.board_game_collection.service.ImageService
 import io.swagger.v3.oas.annotations.Operation
@@ -24,22 +24,22 @@ class BoardGameController(
 
     @GetMapping
     @Operation(operationId = "listBoardGames")
-    fun getAll(): List<BoardGame> = service.findAll()
+    fun getAll(): List<BoardGameResponse> = service.findAll()
 
     @GetMapping("/{id}")
     @Operation(operationId = "getBoardGame")
-    fun getById(@PathVariable id: UUID): BoardGame = service.findById(id)
+    fun getById(@PathVariable id: UUID): BoardGameResponse = service.findById(id)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "createBoardGame")
-    fun create(@Valid @RequestBody request: BoardGameRequest): BoardGame = service.create(request)
+    fun create(@Valid @RequestBody request: BoardGameRequest): BoardGameResponse = service.create(request)
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "updateBoardGame")
-    fun update(@PathVariable id: UUID, @Valid @RequestBody request: BoardGameRequest): BoardGame =
+    fun update(@PathVariable id: UUID, @Valid @RequestBody request: BoardGameRequest): BoardGameResponse =
         service.update(id, request)
 
     @DeleteMapping("/{id}")
