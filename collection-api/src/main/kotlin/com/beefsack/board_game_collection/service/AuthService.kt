@@ -48,7 +48,7 @@ class AuthService(
         try {
             authManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
         } catch (e: AuthenticationException) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials", e)
         }
         val user = userRepo.findByEmail(request.email)
             ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User not found after authentication")
