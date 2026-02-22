@@ -136,8 +136,10 @@ export default function BoardGameFormPage() {
   const [year, setYear] = useState('')
   const [minPlayers, setMinPlayers] = useState('')
   const [maxPlayers, setMaxPlayers] = useState('')
-  const [playTime, setPlayTime] = useState('')
+  const [minPlayTime, setMinPlayTime] = useState('')
+  const [maxPlayTime, setMaxPlayTime] = useState('')
   const [weight, setWeight] = useState('')
+  const [rating, setRating] = useState('')
   const [selectedDesigners, setSelectedDesigners] = useState<Designer[]>([])
   const [selectedPublishers, setSelectedPublishers] = useState<Publisher[]>([])
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -148,8 +150,10 @@ export default function BoardGameFormPage() {
     setYear(existing.yearPublished?.toString() ?? '')
     setMinPlayers(existing.minPlayers?.toString() ?? '')
     setMaxPlayers(existing.maxPlayers?.toString() ?? '')
-    setPlayTime(existing.playTimeMinutes?.toString() ?? '')
+    setMinPlayTime(existing.minPlayTimeMinutes?.toString() ?? '')
+    setMaxPlayTime(existing.maxPlayTimeMinutes?.toString() ?? '')
     setWeight(existing.weight?.toString() ?? '')
+    setRating(existing.rating?.toString() ?? '')
     setSelectedDesigners(
       allDesigners.filter((d) => existing.designers?.some((gd) => gd.designerId === d.id)),
     )
@@ -173,8 +177,10 @@ export default function BoardGameFormPage() {
       yearPublished: year ? parseInt(year) : undefined,
       minPlayers: minPlayers ? parseInt(minPlayers) : undefined,
       maxPlayers: maxPlayers ? parseInt(maxPlayers) : undefined,
-      playTimeMinutes: playTime ? parseInt(playTime) : undefined,
+      minPlayTimeMinutes: minPlayTime ? parseInt(minPlayTime) : undefined,
+      maxPlayTimeMinutes: maxPlayTime ? parseInt(maxPlayTime) : undefined,
       weight: weight ? parseFloat(weight) : undefined,
+      rating: rating ? parseFloat(rating) : undefined,
       designerIds: selectedDesigners.map((d) => d.id!),
       publisherIds: selectedPublishers.map((p) => p.id!),
     }
@@ -217,19 +223,42 @@ export default function BoardGameFormPage() {
               value={year}
               onChange={(e) => setYear(e.target.value)}
               className={fieldClass}
-              min={1900}
-              max={2100}
             />
           </div>
           <div>
-            <label htmlFor="playTime" className="block text-sm font-medium text-gray-700 mb-1">
-              Play time (min)
-            </label>
+            <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">Rating (0–10)</label>
             <input
-              id="playTime"
+              id="rating"
               type="number"
-              value={playTime}
-              onChange={(e) => setPlayTime(e.target.value)}
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              className={fieldClass}
+              min={0}
+              max={10}
+              step={0.1}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="minPlayTime" className="block text-sm font-medium text-gray-700 mb-1">Min play time (min)</label>
+            <input
+              id="minPlayTime"
+              type="number"
+              value={minPlayTime}
+              onChange={(e) => setMinPlayTime(e.target.value)}
+              className={fieldClass}
+              min={1}
+            />
+          </div>
+          <div>
+            <label htmlFor="maxPlayTime" className="block text-sm font-medium text-gray-700 mb-1">Max play time (min)</label>
+            <input
+              id="maxPlayTime"
+              type="number"
+              value={maxPlayTime}
+              onChange={(e) => setMaxPlayTime(e.target.value)}
               className={fieldClass}
               min={1}
             />
@@ -269,7 +298,7 @@ export default function BoardGameFormPage() {
               className={fieldClass}
               min={1}
               max={5}
-              step={0.1}
+              step={0.01}
             />
           </div>
         </div>

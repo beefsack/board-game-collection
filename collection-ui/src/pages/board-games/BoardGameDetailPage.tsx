@@ -34,13 +34,18 @@ export default function BoardGameDetailPage() {
     game.publishers?.some((gp) => gp.publisherId === p.id),
   )
 
+  const playTime = game.minPlayTimeMinutes != null || game.maxPlayTimeMinutes != null
+    ? [game.minPlayTimeMinutes, game.maxPlayTimeMinutes].filter(Boolean).join('–') + ' min'
+    : null
+
   const meta: Array<[string, string | number | null | undefined]> = [
     ['Year', game.yearPublished],
     ['Players', game.minPlayers != null && game.maxPlayers != null
       ? `${game.minPlayers}–${game.maxPlayers}`
       : (game.minPlayers ?? game.maxPlayers)],
-    ['Play time', game.playTimeMinutes != null ? `${game.playTimeMinutes} min` : null],
-    ['Weight', game.weight != null ? `${Number(game.weight).toFixed(1)} / 5` : null],
+    ['Play time', playTime],
+    ['Weight', game.weight != null ? `${Number(game.weight).toFixed(2)} / 5` : null],
+    ['Rating', game.rating != null ? `${Number(game.rating).toFixed(1)} / 10` : null],
   ]
 
   return (

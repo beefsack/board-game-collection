@@ -9,8 +9,10 @@ data class BoardGameRequest(
     val yearPublished: Int?,
     val minPlayers: Int?,
     val maxPlayers: Int?,
-    val playTimeMinutes: Int?,
+    val minPlayTimeMinutes: Int?,
+    val maxPlayTimeMinutes: Int?,
     val weight: BigDecimal?,
+    val rating: BigDecimal?,
     val designerIds: Set<UUID> = emptySet(),
     val publisherIds: Set<UUID> = emptySet(),
 )

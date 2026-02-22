@@ -31,8 +31,10 @@ class BoardGameService(private val repo: BoardGameRepository) {
             yearPublished = request.yearPublished,
             minPlayers = request.minPlayers,
             maxPlayers = request.maxPlayers,
-            playTimeMinutes = request.playTimeMinutes,
+            minPlayTimeMinutes = request.minPlayTimeMinutes,
+            maxPlayTimeMinutes = request.maxPlayTimeMinutes,
             weight = request.weight,
+            rating = request.rating,
             designers = request.designerIds.map { BoardGameDesigner(it) }.toSet(),
             publishers = request.publisherIds.map { BoardGamePublisher(it) }.toSet(),
         ))
@@ -46,8 +48,10 @@ class BoardGameService(private val repo: BoardGameRepository) {
         yearPublished = yearPublished,
         minPlayers = minPlayers,
         maxPlayers = maxPlayers,
-        playTimeMinutes = playTimeMinutes,
+        minPlayTimeMinutes = minPlayTimeMinutes,
+        maxPlayTimeMinutes = maxPlayTimeMinutes,
         weight = weight,
+        rating = rating,
         designers = designerIds.map { BoardGameDesigner(it) }.toSet(),
         publishers = publisherIds.map { BoardGamePublisher(it) }.toSet(),
     )

@@ -54,8 +54,10 @@ export interface BoardGameRequest {
   yearPublished?: number;
   minPlayers?: number;
   maxPlayers?: number;
-  playTimeMinutes?: number;
+  minPlayTimeMinutes?: number;
+  maxPlayTimeMinutes?: number;
   weight?: number;
+  rating?: number;
   designerIds?: string[];
   publisherIds?: string[];
 }
@@ -74,8 +76,10 @@ export interface BoardGame {
   yearPublished?: number;
   minPlayers?: number;
   maxPlayers?: number;
-  playTimeMinutes?: number;
+  minPlayTimeMinutes?: number;
+  maxPlayTimeMinutes?: number;
   weight?: number;
+  rating?: number;
   hasImage?: boolean;
   designers?: BoardGameDesigner[];
   publishers?: BoardGamePublisher[];
