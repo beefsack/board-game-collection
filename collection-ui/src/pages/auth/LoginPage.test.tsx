@@ -4,12 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import LoginPage from './LoginPage'
-import { loginUser } from '../../api/auth'
+import { login } from '../../api/generated'
 import { ApiError } from '../../api/client'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../api/auth', () => ({ loginUser: vi.fn() }))
+vi.mock('../../api/generated', () => ({ login: vi.fn() }))
 
 vi.mock('../../store/auth', () => ({
   useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
@@ -45,22 +45,20 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument()
   })
 
-  it('calls loginUser with entered credentials on submit', async () => {
-    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
+  it('calls login with entered credentials on submit', async () => {
+    vi.mocked(login).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Email'), 'test@example.com')
     await user.type(screen.getByLabelText('Password'), 'password123')
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
-    // TanStack Query v5 passes a context object as a second arg to mutationFn
-    expect(loginUser).toHaveBeenCalledWith(
+    expect(login).toHaveBeenCalledWith(
       { email: 'test@example.com', password: 'password123' },
-      expect.any(Object),
     )
   })
 
   it('navigates to /board-games on successful login', async () => {
-    vi.mocked(loginUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
+    vi.mocked(login).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Email'), 'test@example.com')
@@ -70,7 +68,7 @@ describe('LoginPage', () => {
   })
 
   it('shows error message on 401', async () => {
-    vi.mocked(loginUser).mockRejectedValue(new ApiError('Unauthorized', 401))
+    vi.mocked(login).mockRejectedValue(new ApiError('Unauthorized', 401))
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Email'), 'test@example.com')

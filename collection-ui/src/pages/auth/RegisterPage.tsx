@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { registerUser } from '../../api/auth'
+import { register, type RegisterRequest } from '../../api/generated'
 import { ApiError } from '../../api/client'
 import { useAuthStore } from '../../store/auth'
 import FormField from '../../components/FormField'
@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const navigate = useNavigate()
 
   const mutation = useMutation({
-    mutationFn: registerUser,
+    mutationFn: (data: RegisterRequest) => register(data),
     onSuccess: ({ token, userId, displayName: dn, role }) => {
       setAuth(token, userId, dn, role)
       navigate('/board-games')

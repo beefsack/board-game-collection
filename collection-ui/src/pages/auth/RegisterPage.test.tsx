@@ -4,12 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import RegisterPage from './RegisterPage'
-import { registerUser } from '../../api/auth'
+import { register } from '../../api/generated'
 import { ApiError } from '../../api/client'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../api/auth', () => ({ registerUser: vi.fn() }))
+vi.mock('../../api/generated', () => ({ register: vi.fn() }))
 
 vi.mock('../../store/auth', () => ({
   useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
@@ -45,23 +45,21 @@ describe('RegisterPage', () => {
     expect(screen.getByRole('button', { name: 'Create account' })).toBeInTheDocument()
   })
 
-  it('calls registerUser with entered credentials on submit', async () => {
-    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
+  it('calls register with entered credentials on submit', async () => {
+    vi.mocked(register).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Display name'), 'Alice')
     await user.type(screen.getByLabelText('Email'), 'new@example.com')
     await user.type(screen.getByLabelText('Password'), 'password123')
     await user.click(screen.getByRole('button', { name: 'Create account' }))
-    // TanStack Query v5 passes a context object as a second arg to mutationFn
-    expect(registerUser).toHaveBeenCalledWith(
+    expect(register).toHaveBeenCalledWith(
       { displayName: 'Alice', email: 'new@example.com', password: 'password123' },
-      expect.any(Object),
     )
   })
 
   it('navigates to /board-games on successful registration', async () => {
-    vi.mocked(registerUser).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
+    vi.mocked(register).mockResolvedValue({ token: 'test-token', userId: 'u-1', displayName: 'Alice', role: 'USER' })
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Display name'), 'Alice')
@@ -72,7 +70,7 @@ describe('RegisterPage', () => {
   })
 
   it('shows error message on 409 duplicate email', async () => {
-    vi.mocked(registerUser).mockRejectedValue(new ApiError('Conflict', 409))
+    vi.mocked(register).mockRejectedValue(new ApiError('Conflict', 409))
     const user = userEvent.setup()
     renderPage()
     await user.type(screen.getByLabelText('Display name'), 'Alice')

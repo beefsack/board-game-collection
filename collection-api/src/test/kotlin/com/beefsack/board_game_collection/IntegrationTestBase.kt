@@ -37,7 +37,7 @@ abstract class IntegrationTestBase {
             PostgreSQLContainer("postgres:17").also { it.start() }
 
         private val minio: GenericContainer<*> =
-            GenericContainer("minio/minio")
+            GenericContainer("minio/minio:RELEASE.2025-09-07T16-13-09Z")
                 .withEnv("MINIO_ROOT_USER", "minioadmin")
                 .withEnv("MINIO_ROOT_PASSWORD", "minioadmin")
                 .withCommand("server /data")

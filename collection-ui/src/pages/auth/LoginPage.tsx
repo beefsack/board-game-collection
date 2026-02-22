@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { loginUser } from '../../api/auth'
+import { login, type LoginRequest } from '../../api/generated'
 import { ApiError } from '../../api/client'
 import { useAuthStore } from '../../store/auth'
 import FormField from '../../components/FormField'
@@ -13,7 +13,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
 
   const mutation = useMutation({
-    mutationFn: loginUser,
+    mutationFn: (data: LoginRequest) => login(data),
     onSuccess: ({ token, userId, displayName, role }) => {
       setAuth(token, userId, displayName, role)
       navigate('/board-games')
