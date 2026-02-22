@@ -24,7 +24,10 @@ class UserService(
 ) {
 
     @Transactional(readOnly = true)
-    fun findAll(): List<UserResponse> = userRepo.findAll().map { it.toResponse() }
+    fun findAll(): List<UserResponse> {
+        val counts = userBoardGameRepo.countGroupedByUser().associate { it.id to it.count }
+        return userRepo.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+    }
 
     @Transactional(readOnly = true)
     fun findById(id: UUID): UserResponse =
@@ -44,10 +47,11 @@ class UserService(
     fun removeFromCollection(userId: UUID, boardGameId: UUID) =
         userBoardGameRepo.deleteByUserIdAndBoardGameId(userId, boardGameId)
 
-    private fun User.toResponse() = UserResponse(
+    private fun User.toResponse(gameCount: Int = 0) = UserResponse(
         id = id,
         email = email,
         displayName = displayName,
         role = role,
+        gameCount = gameCount,
     )
 }

@@ -6,7 +6,8 @@ import { useAuthStore } from '../../store/auth'
 
 export default function DesignersPage() {
   const qc = useQueryClient()
-  const { data: designers = [], isLoading } = useListDesigners()
+  const { data: rawDesigners = [], isLoading } = useListDesigners()
+  const designers = [...rawDesigners].sort((a, b) => (b.gameCount ?? 0) - (a.gameCount ?? 0))
   const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
   const [name, setName] = useState('')
   const { mutate: createDesigner, isPending } = useCreateDesigner({
@@ -58,7 +59,7 @@ export default function DesignersPage() {
                 className="flex items-center justify-between py-3 hover:text-indigo-600 transition-colors"
               >
                 <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">
-                  {d.name}
+                  {d.name} — {d.gameCount ?? 0} {d.gameCount === 1 ? 'game' : 'games'}
                 </span>
                 <span className="text-gray-300">›</span>
               </Link>

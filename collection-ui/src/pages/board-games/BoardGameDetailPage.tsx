@@ -5,14 +5,27 @@ import {
   useDeleteBoardGame,
   useListDesigners,
   useListPublishers,
+  useAddToCollection,
+  useRemoveFromCollection,
 } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
+import { useOwnedGameIds } from '../../hooks/useOwnedGameIds'
 
 export default function BoardGameDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
+  const userId = useAuthStore((s) => s.userId)
+  const ownedGameIds = useOwnedGameIds()
+  const isOwned = ownedGameIds.has(id!)
+
+  const { mutate: addToCollection } = useAddToCollection({
+    mutation: { onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/users/${userId}`] }) },
+  })
+  const { mutate: removeFromCollection } = useRemoveFromCollection({
+    mutation: { onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/users/${userId}`] }) },
+  })
 
   const { data: game, isLoading } = useGetBoardGame(id!)
   const { data: designers = [] } = useListDesigners()
@@ -58,24 +71,42 @@ export default function BoardGameDetailPage() {
 
       <div className="flex items-start justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{game.title}</h1>
-        {isAdmin && (
-          <div className="flex gap-2 shrink-0 ml-4">
-            <Link
-              to={`/board-games/${id}/edit`}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Edit
-            </Link>
+        <div className="flex gap-2 shrink-0 ml-4">
+          {userId && (
             <button
               onClick={() =>
-                window.confirm('Delete this game?') && deleteGame({ id: id! })
+                isOwned
+                  ? window.confirm('Remove from your collection?') && removeFromCollection({ id: userId, gameId: id! })
+                  : addToCollection({ id: userId, data: { boardGameId: id } })
               }
-              className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                isOwned
+                  ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                  : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
             >
-              Delete
+              {isOwned ? 'In my collection' : 'Add to my collection'}
             </button>
-          </div>
-        )}
+          )}
+          {isAdmin && (
+            <>
+              <Link
+                to={`/board-games/${id}/edit`}
+                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() =>
+                  window.confirm('Delete this game?') && deleteGame({ id: id! })
+                }
+                className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

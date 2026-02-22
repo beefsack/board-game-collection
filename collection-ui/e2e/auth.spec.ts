@@ -13,6 +13,9 @@ test('successful login redirects to /board-games', async ({ page }) => {
     route.fulfill({ json: { token: 'fake-jwt', userId: 'u-1', displayName: 'Alice', role: 'USER' } }),
   )
   await page.route('**/api/board-games', (route) => route.fulfill({ json: [] }))
+  await page.route('**/api/users/u-1', (route) =>
+    route.fulfill({ json: { user: { id: 'u-1', displayName: 'Alice', role: 'USER' }, collection: [] } }),
+  )
 
   await page.goto('/login')
   await page.getByLabel('Email').fill('user@example.com')
@@ -46,6 +49,9 @@ test('successful registration redirects to /board-games', async ({ page }) => {
     route.fulfill({ json: { token: 'fake-jwt', userId: 'u-1', displayName: 'Alice', role: 'USER' } }),
   )
   await page.route('**/api/board-games', (route) => route.fulfill({ json: [] }))
+  await page.route('**/api/users/u-1', (route) =>
+    route.fulfill({ json: { user: { id: 'u-1', displayName: 'Alice', role: 'USER' }, collection: [] } }),
+  )
 
   await page.goto('/register')
   await page.getByLabel('Display name').fill('Alice')

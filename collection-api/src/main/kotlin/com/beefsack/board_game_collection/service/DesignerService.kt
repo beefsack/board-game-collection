@@ -2,6 +2,7 @@ package com.beefsack.board_game_collection.service
 
 import com.beefsack.board_game_collection.domain.Designer
 import com.beefsack.board_game_collection.dto.DesignerRequest
+import com.beefsack.board_game_collection.dto.DesignerResponse
 import com.beefsack.board_game_collection.repository.DesignerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -15,16 +16,34 @@ import java.util.UUID
 class DesignerService(private val repo: DesignerRepository) {
 
     @Transactional(readOnly = true)
-    fun findAll(): List<Designer> = repo.findAll()
+    fun findAll(): List<DesignerResponse> {
+        val counts = repo.countGamesPerDesigner().associate { it.id to it.count }
+        return repo.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+    }
 
     @Transactional(readOnly = true)
-    fun findById(id: UUID): Designer =
-        repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun findById(id: UUID): DesignerResponse =
+        (repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND))
+            .toResponse(repo.countGamesByDesignerId(id))
 
-    fun create(request: DesignerRequest): Designer = repo.save(Designer(name = request.name))
+    fun create(request: DesignerRequest): DesignerResponse =
+        repo.save(Designer(name = request.name)).toResponse(0)
 
-    fun update(id: UUID, request: DesignerRequest): Designer =
-        repo.save(findById(id).copy(name = request.name))
+    fun update(id: UUID, request: DesignerRequest): DesignerResponse {
+        val saved = repo.save(
+            (repo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND))
+                .copy(name = request.name)
+        )
+        return saved.toResponse(repo.countGamesByDesignerId(id))
+    }
 
     fun delete(id: UUID) = repo.deleteById(id)
+
+    private fun Designer.toResponse(gameCount: Int) = DesignerResponse(
+        id = id,
+        name = name,
+        gameCount = gameCount,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
 }

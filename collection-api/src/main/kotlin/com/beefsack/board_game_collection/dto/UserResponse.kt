@@ -7,4 +7,5 @@ data class UserResponse(
     val email: String,
     val displayName: String,
     val role: String,
+    val gameCount: Int = 0,
 )

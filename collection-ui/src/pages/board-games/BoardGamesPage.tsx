@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom'
 import { useListBoardGames } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
 import GameGrid from '../../components/GameGrid'
+import { useOwnedGameIds } from '../../hooks/useOwnedGameIds'
 
 export default function BoardGamesPage() {
   const { data: games = [], isLoading } = useListBoardGames()
   const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
+  const ownedGameIds = useOwnedGameIds()
 
   return (
     <div>
@@ -20,7 +22,7 @@ export default function BoardGamesPage() {
           </Link>
         )}
       </div>
-      {isLoading ? <p className="text-sm text-gray-500">Loading…</p> : <GameGrid games={games} />}
+      {isLoading ? <p className="text-sm text-gray-500">Loading…</p> : <GameGrid games={games} ownedGameIds={ownedGameIds} />}
     </div>
   )
 }

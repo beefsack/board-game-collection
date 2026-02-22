@@ -11,8 +11,8 @@ import {
   useCreatePublisher,
   useListDesigners,
   useListPublishers,
-  type Designer,
-  type Publisher,
+  type DesignerResponse,
+  type PublisherResponse,
 } from '../../api/generated'
 
 function MultiCombobox<T extends { id?: string; name?: string }>({
@@ -140,8 +140,8 @@ export default function BoardGameFormPage() {
   const [maxPlayTime, setMaxPlayTime] = useState('')
   const [weight, setWeight] = useState('')
   const [rating, setRating] = useState('')
-  const [selectedDesigners, setSelectedDesigners] = useState<Designer[]>([])
-  const [selectedPublishers, setSelectedPublishers] = useState<Publisher[]>([])
+  const [selectedDesigners, setSelectedDesigners] = useState<DesignerResponse[]>([])
+  const [selectedPublishers, setSelectedPublishers] = useState<PublisherResponse[]>([])
   const [imageFile, setImageFile] = useState<File | null>(null)
 
   useEffect(() => {
@@ -303,7 +303,7 @@ export default function BoardGameFormPage() {
           </div>
         </div>
 
-        <MultiCombobox<Designer>
+        <MultiCombobox<DesignerResponse>
           label="Designers"
           items={allDesigners}
           selected={selectedDesigners}
@@ -315,7 +315,7 @@ export default function BoardGameFormPage() {
           }}
         />
 
-        <MultiCombobox<Publisher>
+        <MultiCombobox<PublisherResponse>
           label="Publishers"
           items={allPublishers}
           selected={selectedPublishers}

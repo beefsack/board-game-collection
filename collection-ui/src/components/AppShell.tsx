@@ -6,6 +6,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function AppShell() {
   const token = useAuthStore((s) => s.token)
+  const userId = useAuthStore((s) => s.userId)
   const displayName = useAuthStore((s) => s.displayName)
   const clearAuth = useAuthStore((s) => s.clearAuth)
   const navigate = useNavigate()
@@ -16,11 +17,11 @@ export default function AppShell() {
     <div className="min-h-screen bg-gray-50">
       <nav className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-14 gap-6">
-          <span className="font-semibold text-gray-900 mr-2">Board Games</span>
-          <NavLink to="/board-games" className={navLinkClass}>Collection</NavLink>
+          <NavLink to="/board-games" className={navLinkClass}>Board Games</NavLink>
+          <NavLink to={`/users/${userId}`} className={navLinkClass}>My Collection</NavLink>
           <NavLink to="/designers" className={navLinkClass}>Designers</NavLink>
           <NavLink to="/publishers" className={navLinkClass}>Publishers</NavLink>
-          <NavLink to="/users" className={navLinkClass}>Users</NavLink>
+          <NavLink to="/users" className={navLinkClass}>Collections</NavLink>
           <div className="ml-auto flex items-center gap-3">
             {displayName && (
               <span className="text-sm text-gray-600">{displayName}</span>

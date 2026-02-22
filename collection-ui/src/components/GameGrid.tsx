@@ -3,6 +3,7 @@ import type { BoardGame } from '../api/generated'
 
 interface GameGridProps {
   games: BoardGame[]
+  ownedGameIds?: Set<string>
 }
 
 function compactStats(game: BoardGame): [string, string] {
@@ -21,7 +22,7 @@ function compactStats(game: BoardGame): [string, string] {
   return [line1, line2]
 }
 
-export default function GameGrid({ games }: GameGridProps) {
+export default function GameGrid({ games, ownedGameIds }: GameGridProps) {
   if (games.length === 0) {
     return <p className="text-sm text-gray-500">No games found.</p>
   }
@@ -33,9 +34,14 @@ export default function GameGrid({ games }: GameGridProps) {
         return (
           <li key={game.id}>
             <Link to={`/board-games/${game.id}`} className="group block">
-              <div className="aspect-square rounded-lg bg-gray-100 mb-2 overflow-hidden">
+              <div className="relative aspect-square rounded-lg bg-gray-100 mb-2 overflow-hidden">
                 {game.hasImage && (
                   <img src={`/images/board-games/${game.id}`} alt="" className="h-full w-full object-cover" />
+                )}
+                {ownedGameIds?.has(game.id!) && (
+                  <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white text-xs font-bold">
+                    ✓
+                  </span>
                 )}
               </div>
               <p className="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">

@@ -9,6 +9,9 @@ import {
   useDeleteBoardGame,
   useListDesigners,
   useListPublishers,
+  useGetUser,
+  useAddToCollection,
+  useRemoveFromCollection,
 } from '../../api/generated'
 
 const mockNavigate = vi.fn()
@@ -16,7 +19,7 @@ const mockDeleteMutate = vi.fn()
 
 vi.mock('../../store/auth', () => ({
   useAuthStore: vi.fn((selector: (s: unknown) => unknown) =>
-    selector({ role: 'ADMIN' }),
+    selector({ role: 'ADMIN', userId: 'user-1' }),
   ),
 }))
 
@@ -25,6 +28,9 @@ vi.mock('../../api/generated', () => ({
   useDeleteBoardGame: vi.fn(),
   useListDesigners: vi.fn(),
   useListPublishers: vi.fn(),
+  useGetUser: vi.fn(),
+  useAddToCollection: vi.fn(),
+  useRemoveFromCollection: vi.fn(),
 }))
 
 vi.mock('react-router-dom', async (importActual) => {
@@ -58,6 +64,16 @@ function renderPage() {
   vi.mocked(useListPublishers).mockReturnValue({
     data: [{ id: 'publisher-1', name: 'Stonemaier Games' }],
   } as ReturnType<typeof useListPublishers>)
+  vi.mocked(useGetUser).mockReturnValue({
+    data: { user: { id: 'user-1' }, collection: [] },
+    isLoading: false,
+  } as ReturnType<typeof useGetUser>)
+  vi.mocked(useAddToCollection).mockReturnValue({
+    mutate: vi.fn(),
+  } as unknown as ReturnType<typeof useAddToCollection>)
+  vi.mocked(useRemoveFromCollection).mockReturnValue({
+    mutate: vi.fn(),
+  } as unknown as ReturnType<typeof useRemoveFromCollection>)
 
   const qc = new QueryClient()
   return render(

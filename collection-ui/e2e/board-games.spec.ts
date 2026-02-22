@@ -4,6 +4,9 @@ const AUTH_STORAGE = JSON.stringify({ state: { token: 'fake-jwt', userId: 'u-1',
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(`localStorage.setItem('auth', ${JSON.stringify(AUTH_STORAGE)})`)
+  await page.route('**/api/users/u-1', (route) =>
+    route.fulfill({ json: { user: { id: 'u-1', displayName: 'Test User', role: 'ADMIN' }, collection: [] } }),
+  )
 })
 
 test('board games list shows games from API', async ({ page }) => {

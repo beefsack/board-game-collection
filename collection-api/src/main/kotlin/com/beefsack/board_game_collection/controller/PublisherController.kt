@@ -1,7 +1,7 @@
 package com.beefsack.board_game_collection.controller
 
-import com.beefsack.board_game_collection.domain.Publisher
 import com.beefsack.board_game_collection.dto.PublisherRequest
+import com.beefsack.board_game_collection.dto.PublisherResponse
 import com.beefsack.board_game_collection.service.PublisherService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
@@ -18,22 +18,22 @@ class PublisherController(private val service: PublisherService) {
 
     @GetMapping
     @Operation(operationId = "listPublishers")
-    fun getAll(): List<Publisher> = service.findAll()
+    fun getAll(): List<PublisherResponse> = service.findAll()
 
     @GetMapping("/{id}")
     @Operation(operationId = "getPublisher")
-    fun getById(@PathVariable id: UUID): Publisher = service.findById(id)
+    fun getById(@PathVariable id: UUID): PublisherResponse = service.findById(id)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "createPublisher")
-    fun create(@Valid @RequestBody request: PublisherRequest): Publisher = service.create(request)
+    fun create(@Valid @RequestBody request: PublisherRequest): PublisherResponse = service.create(request)
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "updatePublisher")
-    fun update(@PathVariable id: UUID, @Valid @RequestBody request: PublisherRequest): Publisher =
+    fun update(@PathVariable id: UUID, @Valid @RequestBody request: PublisherRequest): PublisherResponse =
         service.update(id, request)
 
     @DeleteMapping("/{id}")

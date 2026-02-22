@@ -282,6 +282,68 @@ To further demonstrate breadth of skill, the following enhancements are planned 
 * **Promote a user to admin** via a direct SQL update (no admin UI needed initially):
   `UPDATE users SET role = 'ADMIN' WHERE email = 'you@example.com';`
 
+### **9.4. Public Browsing (Unauthenticated Read Access)**
+
+**Objective:** Allow anyone to browse the catalogue — board games, designers, publishers, and user collection pages — without needing an account. Authentication is only required to perform write operations or manage a collection.
+
+**Current State:** All API endpoints require a valid JWT (`authenticated()` rule in `SecurityConfiguration`). The frontend wraps all routes in `ProtectedRoute`, which redirects unauthenticated visitors to `/login` immediately.
+
+**Proposed Backend Changes (Spring Security):**
+
+* **Open all GET endpoints to anonymous access** by updating the `SecurityConfiguration` `authorizeHttpRequests` rules:
+  * `GET /api/**` → `permitAll()`
+  * `POST /api/auth/**` → `permitAll()` (already the case)
+  * All other methods (`POST`, `PUT`, `DELETE` on non-auth paths) → `authenticated()`
+* The existing `@PreAuthorize("hasRole('ADMIN')")` annotations on write service methods remain unchanged — they provide the finer-grained checks once a request is authenticated.
+
+**Proposed Frontend Changes:**
+
+* **Remove `ProtectedRoute`** from all browse/read routes: board games (list + detail), designers (list + detail), publishers (list + detail), users (list + detail).
+* **Keep `ProtectedRoute`** only on write routes: create/edit form pages (`/board-games/new`, `/board-games/:id/edit`, etc.) and any user collection management views.
+* **Update `AppShell`** to handle the unauthenticated state gracefully: when no token is present, show "Sign in / Register" links in the nav instead of the display name and sign-out button.
+* The `mutator.ts` API client omits the `Authorization` header when no token is stored in Zustand — this already works correctly and requires no change.
+
+### **9.5. UI Polish & Navigation Improvements**
+
+**Objective:** Improve navigation clarity and make the collection-management experience first-class.
+
+#### **9.5.1. Navigation Bar**
+
+* **"Board Games" heading is a link:** The `AppShell` title text ("Board Games") becomes a `<Link to="/board-games">` so clicking the logo/heading navigates to the index.
+* **"My Collection" link (auth-gated):** A "My Collection" link is added as the first nav item after the heading. It links to `/users/{userId}` (the currently logged-in user's detail page). Only rendered when a token is present in the auth store.
+* **Replace "Users" with "Collections":** The "Users" nav link is removed. A "Collections" link is added at the *end* of the nav bar, linking to `/users`. This is always visible (public browsing, per 9.4).
+
+#### **9.5.2. Collections Index Page (`/users`)**
+
+* The page currently shows a plain list of users. It should be updated to display each user's game count alongside their name.
+* **Backend:** Add a `gameCount` field to the `UserResponse` DTO, populated by a `COUNT` on `user_board_games` grouped by `user_id`. This can be a single query joining `users` with an aggregate subquery — no new endpoint needed.
+* **Frontend:** Sort users by `gameCount` descending client-side (the list is small). Display the count next to each user's name (e.g. "Alice — 12 games").
+
+#### **9.5.3. Designers & Publishers Index Pages**
+
+* Same pattern as Collections: each designer/publisher row shows the number of board games associated with them, sorted by count descending.
+* **Backend:** Add a `gameCount` field to `DesignerResponse` and `PublisherResponse` DTOs, populated from `COUNT` aggregates on `board_game_designers` / `board_game_publishers`. No new endpoints.
+* **Frontend:** Sort by `gameCount` descending client-side.
+
+#### **9.5.4. "Own" Indicator on Game Grid Cards**
+
+* When a game grid card is rendered and the viewer is logged in, a small icon (e.g. a checkmark badge or shelf icon) is overlaid on the card if the game is in the logged-in user's collection.
+* **Data source:** Fetch `GET /api/users/{userId}` (the logged-in user's detail, which returns their `boardGames` list) and keep the result in a TanStack Query cache entry keyed by `userId`. The `GameGrid` component (or its parent) passes down a `Set<string>` of owned game IDs. No new backend endpoint needed.
+* Only rendered when a `userId` is present in the auth store; unauthenticated visitors see no indicator.
+
+#### **9.5.5. Add / Remove from Collection on Board Game Detail**
+
+* The board game detail page gains an "Add to my collection" / "Remove from my collection" toggle button, visible only when logged in.
+* **Logic:** If the game's ID appears in the logged-in user's `boardGames` list (same cached query as 9.5.4), show "Remove from my collection" (calls `DELETE /api/users/{userId}/board-games/{gameId}`); otherwise show "Add to my collection" (calls `POST /api/users/{userId}/board-games`).
+* On success, invalidate the user detail query so the indicator and collection page update automatically.
+
+#### **9.5.6. "My Collection" Page — Add Game UI**
+
+* The user detail page (when viewing your own collection) gains a searchable select box to add a game directly from the page, without navigating to the board game detail first.
+* **Component:** Reuse the existing `MultiCombobox` pattern (Headless UI Combobox) already used in `BoardGameFormPage`. The input searches the full `GET /api/board-games` list and filters out games already owned.
+* On selection, call `POST /api/users/{userId}/board-games` and invalidate the user detail query. The grid updates immediately.
+* The add-game combobox is only rendered when `userId === authStore.userId` (viewing your own page).
+
 ---
 
 ## **10\. Out of Scope: Known Production Gaps**

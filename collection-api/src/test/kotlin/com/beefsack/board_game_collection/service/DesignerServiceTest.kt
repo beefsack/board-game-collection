@@ -2,6 +2,7 @@ package com.beefsack.board_game_collection.service
 
 import com.beefsack.board_game_collection.domain.Designer
 import com.beefsack.board_game_collection.dto.DesignerRequest
+import com.beefsack.board_game_collection.dto.DesignerResponse
 import com.beefsack.board_game_collection.repository.DesignerRepository
 import io.mockk.every
 import io.mockk.just
@@ -23,10 +24,16 @@ class DesignerServiceTest {
 
     @Test
     fun `findAll returns list from repository`() {
-        val designers = listOf(Designer(id = UUID.randomUUID(), name = "Reiner Knizia"))
-        every { repo.findAll() } returns designers
+        val id = UUID.randomUUID()
+        val designer = Designer(id = id, name = "Reiner Knizia")
+        every { repo.findAll() } returns listOf(designer)
+        every { repo.countGamesPerDesigner() } returns emptyList()
 
-        assertEquals(designers, service.findAll())
+        val result = service.findAll()
+        assertEquals(1, result.size)
+        assertEquals(id, result[0].id)
+        assertEquals("Reiner Knizia", result[0].name)
+        assertEquals(0, result[0].gameCount)
     }
 
     @Test
@@ -34,8 +41,10 @@ class DesignerServiceTest {
         val id = UUID.randomUUID()
         val designer = Designer(id = id, name = "Reiner Knizia")
         every { repo.findById(id) } returns Optional.of(designer)
+        every { repo.countGamesByDesignerId(id) } returns 3
 
-        assertEquals(designer, service.findById(id))
+        val result = service.findById(id)
+        assertEquals(DesignerResponse(id = id, name = "Reiner Knizia", gameCount = 3, createdAt = null, updatedAt = null), result)
     }
 
     @Test
@@ -52,7 +61,10 @@ class DesignerServiceTest {
         val saved = Designer(id = UUID.randomUUID(), name = "Reiner Knizia")
         every { repo.save(any()) } returns saved
 
-        assertEquals(saved, service.create(DesignerRequest("Reiner Knizia")))
+        val result = service.create(DesignerRequest("Reiner Knizia"))
+        assertEquals(saved.id, result.id)
+        assertEquals("Reiner Knizia", result.name)
+        assertEquals(0, result.gameCount)
         verify { repo.save(match { it.name == "Reiner Knizia" && it.id == null }) }
     }
 
@@ -63,8 +75,11 @@ class DesignerServiceTest {
         val updated = existing.copy(name = "New Name")
         every { repo.findById(id) } returns Optional.of(existing)
         every { repo.save(updated) } returns updated
+        every { repo.countGamesByDesignerId(id) } returns 2
 
-        assertEquals(updated, service.update(id, DesignerRequest("New Name")))
+        val result = service.update(id, DesignerRequest("New Name"))
+        assertEquals("New Name", result.name)
+        assertEquals(2, result.gameCount)
         verify { repo.save(updated) }
     }
 

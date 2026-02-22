@@ -29,9 +29,10 @@ export interface PublisherRequest {
   name: string;
 }
 
-export interface Publisher {
+export interface PublisherResponse {
   id?: string;
   name?: string;
+  gameCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -41,9 +42,10 @@ export interface DesignerRequest {
   name: string;
 }
 
-export interface Designer {
+export interface DesignerResponse {
   id?: string;
   name?: string;
+  gameCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -132,6 +134,7 @@ export interface UserResponse {
   email?: string;
   displayName?: string;
   role?: string;
+  gameCount?: number;
 }
 
 export interface UserCollectionResponse {
@@ -155,9 +158,9 @@ export const getGetPublisherUrl = (id: string,) => {
   return `/api/publishers/${id}`
 }
 
-export const getPublisher = async (id: string, options?: RequestInit): Promise<Publisher> => {
+export const getPublisher = async (id: string, options?: RequestInit): Promise<PublisherResponse> => {
   
-  return apiFetch<Publisher>(getGetPublisherUrl(id),
+  return apiFetch<PublisherResponse>(getGetPublisherUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -249,9 +252,9 @@ export const getUpdatePublisherUrl = (id: string,) => {
 }
 
 export const updatePublisher = async (id: string,
-    publisherRequest: PublisherRequest, options?: RequestInit): Promise<Publisher> => {
+    publisherRequest: PublisherRequest, options?: RequestInit): Promise<PublisherResponse> => {
   
-  return apiFetch<Publisher>(getUpdatePublisherUrl(id),
+  return apiFetch<PublisherResponse>(getUpdatePublisherUrl(id),
   {      
     ...options,
     method: 'PUT',
@@ -378,9 +381,9 @@ export const getGetDesignerUrl = (id: string,) => {
   return `/api/designers/${id}`
 }
 
-export const getDesigner = async (id: string, options?: RequestInit): Promise<Designer> => {
+export const getDesigner = async (id: string, options?: RequestInit): Promise<DesignerResponse> => {
   
-  return apiFetch<Designer>(getGetDesignerUrl(id),
+  return apiFetch<DesignerResponse>(getGetDesignerUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -472,9 +475,9 @@ export const getUpdateDesignerUrl = (id: string,) => {
 }
 
 export const updateDesigner = async (id: string,
-    designerRequest: DesignerRequest, options?: RequestInit): Promise<Designer> => {
+    designerRequest: DesignerRequest, options?: RequestInit): Promise<DesignerResponse> => {
   
-  return apiFetch<Designer>(getUpdateDesignerUrl(id),
+  return apiFetch<DesignerResponse>(getUpdateDesignerUrl(id),
   {      
     ...options,
     method: 'PUT',
@@ -890,9 +893,9 @@ export const getListPublishersUrl = () => {
   return `/api/publishers`
 }
 
-export const listPublishers = async ( options?: RequestInit): Promise<Publisher[]> => {
+export const listPublishers = async ( options?: RequestInit): Promise<PublisherResponse[]> => {
   
-  return apiFetch<Publisher[]>(getListPublishersUrl(),
+  return apiFetch<PublisherResponse[]>(getListPublishersUrl(),
   {      
     ...options,
     method: 'GET'
@@ -983,9 +986,9 @@ export const getCreatePublisherUrl = () => {
   return `/api/publishers`
 }
 
-export const createPublisher = async (publisherRequest: PublisherRequest, options?: RequestInit): Promise<Publisher> => {
+export const createPublisher = async (publisherRequest: PublisherRequest, options?: RequestInit): Promise<PublisherResponse> => {
   
-  return apiFetch<Publisher>(getCreatePublisherUrl(),
+  return apiFetch<PublisherResponse>(getCreatePublisherUrl(),
   {      
     ...options,
     method: 'POST',
@@ -1048,9 +1051,9 @@ export const getListDesignersUrl = () => {
   return `/api/designers`
 }
 
-export const listDesigners = async ( options?: RequestInit): Promise<Designer[]> => {
+export const listDesigners = async ( options?: RequestInit): Promise<DesignerResponse[]> => {
   
-  return apiFetch<Designer[]>(getListDesignersUrl(),
+  return apiFetch<DesignerResponse[]>(getListDesignersUrl(),
   {      
     ...options,
     method: 'GET'
@@ -1141,9 +1144,9 @@ export const getCreateDesignerUrl = () => {
   return `/api/designers`
 }
 
-export const createDesigner = async (designerRequest: DesignerRequest, options?: RequestInit): Promise<Designer> => {
+export const createDesigner = async (designerRequest: DesignerRequest, options?: RequestInit): Promise<DesignerResponse> => {
   
-  return apiFetch<Designer>(getCreateDesignerUrl(),
+  return apiFetch<DesignerResponse>(getCreateDesignerUrl(),
   {      
     ...options,
     method: 'POST',

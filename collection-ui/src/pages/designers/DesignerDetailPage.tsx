@@ -9,12 +9,14 @@ import {
 } from '../../api/generated'
 import { useAuthStore } from '../../store/auth'
 import GameGrid from '../../components/GameGrid'
+import { useOwnedGameIds } from '../../hooks/useOwnedGameIds'
 
 export default function DesignerDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
+  const ownedGameIds = useOwnedGameIds()
 
   const { data: designer, isLoading } = useGetDesigner(id!)
   const { data: allGames = [] } = useListBoardGames()
@@ -104,7 +106,7 @@ export default function DesignerDetailPage() {
       {games.length > 0 && (
         <section>
           <h2 className="text-sm font-medium text-gray-500 mb-3">Games</h2>
-          <GameGrid games={games} />
+          <GameGrid games={games} ownedGameIds={ownedGameIds} />
         </section>
       )}
     </div>

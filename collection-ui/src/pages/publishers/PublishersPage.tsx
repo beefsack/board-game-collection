@@ -6,7 +6,8 @@ import { useAuthStore } from '../../store/auth'
 
 export default function PublishersPage() {
   const qc = useQueryClient()
-  const { data: publishers = [], isLoading } = useListPublishers()
+  const { data: rawPublishers = [], isLoading } = useListPublishers()
+  const publishers = [...rawPublishers].sort((a, b) => (b.gameCount ?? 0) - (a.gameCount ?? 0))
   const isAdmin = useAuthStore((s) => s.role === 'ADMIN')
   const [name, setName] = useState('')
   const { mutate: createPublisher, isPending } = useCreatePublisher({
@@ -57,7 +58,9 @@ export default function PublishersPage() {
                 to={`/publishers/${p.id}`}
                 className="flex items-center justify-between py-3 hover:text-indigo-600 transition-colors"
               >
-                <span className="text-sm font-medium text-gray-900">{p.name}</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {p.name} — {p.gameCount ?? 0} {p.gameCount === 1 ? 'game' : 'games'}
+                </span>
                 <span className="text-gray-300">›</span>
               </Link>
             </li>
