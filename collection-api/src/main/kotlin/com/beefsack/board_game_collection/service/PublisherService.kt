@@ -56,7 +56,7 @@ class PublisherService(
         name = name,
         gameCount = gameCount,
         topGames = topGames,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
+        createdAt = createdAt!!,
+        updatedAt = updatedAt!!,
     )
 }

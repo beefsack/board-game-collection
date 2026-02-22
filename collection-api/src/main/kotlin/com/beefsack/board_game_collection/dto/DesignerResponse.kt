@@ -9,6 +9,6 @@ data class DesignerResponse(
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val name: String,
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val gameCount: Int = 0,
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val topGames: List<BoardGameResponse> = emptyList(),
-    val createdAt: Instant?,
-    val updatedAt: Instant?,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val createdAt: Instant,
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED) val updatedAt: Instant,
 )

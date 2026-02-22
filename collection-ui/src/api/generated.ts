@@ -51,8 +51,8 @@ export interface PublisherResponse {
   name: string;
   gameCount: number;
   topGames: BoardGame[];
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DesignerRequest {
@@ -65,8 +65,8 @@ export interface DesignerResponse {
   name: string;
   gameCount: number;
   topGames: BoardGame[];
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BoardGameRequest {

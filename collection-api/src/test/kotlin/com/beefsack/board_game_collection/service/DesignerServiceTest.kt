@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 
@@ -27,7 +28,7 @@ class DesignerServiceTest {
     @Test
     fun `findAll returns list from repository`() {
         val id = UUID.randomUUID()
-        val designer = Designer(id = id, name = "Reiner Knizia")
+        val designer = Designer(id = id, name = "Reiner Knizia", createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH)
         every { repo.findAll() } returns listOf(designer)
         every { repo.countGamesPerDesigner() } returns emptyList()
         every { repo.findTopGameMappingsPerDesigner() } returns emptyList()
@@ -43,12 +44,12 @@ class DesignerServiceTest {
     @Test
     fun `findById returns designer when found`() {
         val id = UUID.randomUUID()
-        val designer = Designer(id = id, name = "Reiner Knizia")
+        val designer = Designer(id = id, name = "Reiner Knizia", createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH)
         every { repo.findById(id) } returns Optional.of(designer)
         every { repo.countGamesByDesignerId(id) } returns 3
 
         val result = service.findById(id)
-        assertEquals(DesignerResponse(id = id, name = "Reiner Knizia", gameCount = 3, createdAt = null, updatedAt = null), result)
+        assertEquals(DesignerResponse(id = id, name = "Reiner Knizia", gameCount = 3, createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH), result)
     }
 
     @Test
@@ -62,7 +63,7 @@ class DesignerServiceTest {
 
     @Test
     fun `create saves and returns new designer`() {
-        val saved = Designer(id = UUID.randomUUID(), name = "Reiner Knizia")
+        val saved = Designer(id = UUID.randomUUID(), name = "Reiner Knizia", createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH)
         every { repo.save(any()) } returns saved
 
         val result = service.create(DesignerRequest("Reiner Knizia"))
@@ -75,7 +76,7 @@ class DesignerServiceTest {
     @Test
     fun `update applies new name to existing designer`() {
         val id = UUID.randomUUID()
-        val existing = Designer(id = id, name = "Old Name")
+        val existing = Designer(id = id, name = "Old Name", createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH)
         val updated = existing.copy(name = "New Name")
         every { repo.findById(id) } returns Optional.of(existing)
         every { repo.save(updated) } returns updated

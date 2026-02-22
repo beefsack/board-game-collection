@@ -38,7 +38,8 @@ class UserService(
 
     @Transactional(readOnly = true)
     fun findById(id: UUID): UserResponse =
-        (userRepo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)).toResponse()
+        (userRepo.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND))
+            .toResponse(userBoardGameRepo.countByUserId(id))
 
     @Transactional(readOnly = true)
     fun findCollection(userId: UUID): List<BoardGameResponse> =

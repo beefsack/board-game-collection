@@ -11,6 +11,9 @@ interface UserBoardGameRepository : ListCrudRepository<UserBoardGame, UUID> {
     fun findByUserId(userId: UUID): List<UserBoardGame>
     fun deleteByUserIdAndBoardGameId(userId: UUID, boardGameId: UUID)
 
+    @Query("SELECT COUNT(*) FROM user_board_games WHERE user_id = :userId")
+    fun countByUserId(userId: UUID): Int
+
     @Query("SELECT user_id AS id, COUNT(*) AS count FROM user_board_games GROUP BY user_id")
     fun countGroupedByUser(): List<GameCountResult>
 
