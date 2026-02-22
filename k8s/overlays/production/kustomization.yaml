@@ -21,6 +21,6 @@ patches:
 # CI updates these tags to the specific git SHA after a successful build.
 images:
   - name: ghcr.io/beefsack/board-game-collection-api
-    newTag: 7a31103c20e08dcdb2f7267af12b0f8d5ded1202
+    newTag: 451ca747539d78d08af7861f890ff0db8d6c565b
   - name: ghcr.io/beefsack/board-game-collection-ui
-    newTag: 7a31103c20e08dcdb2f7267af12b0f8d5ded1202
+    newTag: 451ca747539d78d08af7861f890ff0db8d6c565b
