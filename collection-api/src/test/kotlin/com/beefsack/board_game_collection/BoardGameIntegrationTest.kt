@@ -39,7 +39,7 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
                         yearPublished = 1999,
                         minPlayers = 2,
                         maxPlayers = 2,
-                        playTimeMinutes = 30,
+                        minPlayTimeMinutes = 30,
                         weight = BigDecimal("2.05"),
                     )
                 ))
@@ -83,13 +83,13 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
                         yearPublished = 1999,
                         minPlayers = 2,
                         maxPlayers = 2,
-                        playTimeMinutes = 60,
+                        minPlayTimeMinutes = 60,
                         weight = BigDecimal("2.05"),
                     )
                 ))
         )
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.playTimeMinutes").value(60))
+            .andExpect(jsonPath("$.minPlayTimeMinutes").value(60))
     }
 
     @Test

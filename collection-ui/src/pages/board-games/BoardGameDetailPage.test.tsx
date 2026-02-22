@@ -32,7 +32,7 @@ const mockGame = {
   yearPublished: 2019,
   minPlayers: 1,
   maxPlayers: 5,
-  playTimeMinutes: 70,
+  minPlayTimeMinutes: 70,
   weight: 2.4,
   designers: [{ designerId: 'designer-1' }],
   publishers: [{ publisherId: 'publisher-1' }],
@@ -72,7 +72,7 @@ describe('BoardGameDetailPage', () => {
     expect(screen.getByText('2019')).toBeInTheDocument()
     expect(screen.getByText('1–5')).toBeInTheDocument()
     expect(screen.getByText('70 min')).toBeInTheDocument()
-    expect(screen.getByText('2.4 / 5')).toBeInTheDocument()
+    expect(screen.getByText('2.40 / 5')).toBeInTheDocument()
   })
 
   it('renders resolved designer and publisher names as links', () => {

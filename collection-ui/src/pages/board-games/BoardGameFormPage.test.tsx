@@ -8,18 +8,23 @@ import {
   useGetBoardGame,
   useCreateBoardGame,
   useUpdateBoardGame,
+  useUploadBoardGameImage,
+  useCreateDesigner,
+  useCreatePublisher,
   useListDesigners,
   useListPublishers,
 } from '../../api/generated'
 
 const mockNavigate = vi.fn()
-const mockCreateMutate = vi.fn()
-const mockUpdateMutate = vi.fn()
+const mockCreateMutateAsync = vi.fn().mockResolvedValue({ id: 'new-game-id' })
 
 vi.mock('../../api/generated', () => ({
   useGetBoardGame: vi.fn(),
   useCreateBoardGame: vi.fn(),
   useUpdateBoardGame: vi.fn(),
+  useUploadBoardGameImage: vi.fn(),
+  useCreateDesigner: vi.fn(),
+  useCreatePublisher: vi.fn(),
   useListDesigners: vi.fn(),
   useListPublishers: vi.fn(),
 }))
@@ -38,13 +43,23 @@ function renderPage() {
     isLoading: false,
   } as ReturnType<typeof useGetBoardGame>)
   vi.mocked(useCreateBoardGame).mockReturnValue({
-    mutate: mockCreateMutate,
+    mutateAsync: mockCreateMutateAsync,
     isPending: false,
   } as unknown as ReturnType<typeof useCreateBoardGame>)
   vi.mocked(useUpdateBoardGame).mockReturnValue({
-    mutate: mockUpdateMutate,
+    mutateAsync: vi.fn(),
     isPending: false,
   } as unknown as ReturnType<typeof useUpdateBoardGame>)
+  vi.mocked(useUploadBoardGameImage).mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  } as unknown as ReturnType<typeof useUploadBoardGameImage>)
+  vi.mocked(useCreateDesigner).mockReturnValue({
+    mutateAsync: vi.fn(),
+  } as unknown as ReturnType<typeof useCreateDesigner>)
+  vi.mocked(useCreatePublisher).mockReturnValue({
+    mutateAsync: vi.fn(),
+  } as unknown as ReturnType<typeof useCreatePublisher>)
   vi.mocked(useListDesigners).mockReturnValue({
     data: mockDesigners,
   } as ReturnType<typeof useListDesigners>)
@@ -74,10 +89,12 @@ describe('BoardGameFormPage — create mode', () => {
   it('renders all optional fields', () => {
     renderPage()
     expect(screen.getByLabelText('Year')).toBeInTheDocument()
-    expect(screen.getByLabelText('Play time (min)')).toBeInTheDocument()
+    expect(screen.getByLabelText('Min play time (min)')).toBeInTheDocument()
+    expect(screen.getByLabelText('Max play time (min)')).toBeInTheDocument()
     expect(screen.getByLabelText('Min players')).toBeInTheDocument()
     expect(screen.getByLabelText('Max players')).toBeInTheDocument()
     expect(screen.getByLabelText('Weight')).toBeInTheDocument()
+    expect(screen.getByLabelText('Rating (0–10)')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search designers…')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search publishers…')).toBeInTheDocument()
   })
@@ -88,7 +105,7 @@ describe('BoardGameFormPage — create mode', () => {
     await user.type(screen.getByLabelText('Title *'), 'Pandemic')
     await user.type(screen.getByLabelText('Year'), '2008')
     await user.click(screen.getByRole('button', { name: 'Save' }))
-    expect(mockCreateMutate).toHaveBeenCalledWith(
+    expect(mockCreateMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ title: 'Pandemic', yearPublished: 2008 }),
       }),
