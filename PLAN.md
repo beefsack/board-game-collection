@@ -256,6 +256,47 @@ To further demonstrate breadth of skill, the following enhancements are planned 
 
 * **Auto-renewal:** cert-manager automatically renews certificates before expiry (Let's Encrypt certificates are valid for 90 days; renewal is triggered at 60 days). No manual intervention required.
 
+### **9.2b. Background Worker & Image Cleanup**
+
+**Objective:** Demonstrate a long-running background worker process by implementing asynchronous cleanup of MinIO images when a board game is deleted. This also validates the `worker` Spring profile and its Kubernetes `Deployment` primitive described in the process architecture (Section 8.2).
+
+**Problem:** When a board game is deleted via `DELETE /api/board-games/{id}`, the corresponding image in MinIO (`board-games/{id}`) is not removed. Over time this leaves orphaned objects in the bucket.
+
+**Design: PostgreSQL-backed job queue**
+
+Rather than introducing Redis or a message broker, we use a simple `image_cleanup_jobs` table as the queue. This keeps the infrastructure footprint minimal (no new stateful dependency) and is sufficient for the low throughput of this use case.
+
+* **Migration (`V5__image_cleanup_jobs.sql`):**
+  ```sql
+  CREATE TABLE image_cleanup_jobs (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      board_game_id UUID NOT NULL,
+      created_at  TIMESTAMP NOT NULL DEFAULT now()
+  );
+  ```
+  No status column needed — jobs are deleted on successful processing. A failed job (MinIO error) is retried on the next poll cycle as the row persists.
+
+* **Enqueue on delete:** In `BoardGameService.delete()`, after `repo.deleteById(id)`, insert a row into `image_cleanup_jobs` for the deleted game's ID. This happens within the same transaction — if the DB delete rolls back, no job is enqueued.
+
+* **Worker (`worker` Spring profile):** An `ApplicationRunner` bean annotated `@Profile("worker")` runs an infinite poll loop:
+  1. Fetch a batch of pending jobs (`SELECT ... LIMIT 10 FOR UPDATE SKIP LOCKED`).
+  2. For each job: attempt to delete the image from MinIO; on success, delete the job row.
+  3. Sleep briefly between poll cycles (e.g. 5 seconds) when the queue is empty.
+  * `FOR UPDATE SKIP LOCKED` ensures safe concurrent execution if multiple worker replicas are ever deployed.
+  * The loop runs indefinitely; Kubernetes manages restarts if the process exits.
+
+* **Local dev:** Run the worker in a second terminal:
+  ```bash
+  ./gradlew bootRun --args='--spring.profiles.active=worker'
+  ```
+
+**Kubernetes manifest:**
+
+* A new `Deployment` manifest (`k8s/base/worker-deployment.yaml`) running the shared API image with `SPRING_PROFILES_ACTIVE=worker`.
+* No `Service` or `Ingress` — the worker makes no inbound connections.
+* Single replica (the `SKIP LOCKED` pattern supports multiple replicas safely, but one is sufficient).
+* Added to `kustomization.yaml` in both base and production overlay.
+
 ### **9.3. Authorization (Role-Based Access Control)**
 
 **Objective:** Restrict write operations so that regular users can only modify their own data, and introduce an `ADMIN` role for privileged operations (managing the board game catalogue, designers, publishers, and all users).

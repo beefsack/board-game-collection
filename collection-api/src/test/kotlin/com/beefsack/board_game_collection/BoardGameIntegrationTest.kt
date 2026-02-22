@@ -48,8 +48,8 @@ class BoardGameIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET board games without token returns 401`() {
-        mockMvc.perform(get("/api/board-games"))
+    fun `POST board games without token returns 401`() {
+        mockMvc.perform(post("/api/board-games"))
             .andExpect(status().isUnauthorized)
     }
 

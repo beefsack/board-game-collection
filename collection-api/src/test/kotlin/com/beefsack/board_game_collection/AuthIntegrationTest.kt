@@ -93,18 +93,17 @@ class AuthIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `protected endpoint requires authentication`() {
-        mockMvc.perform(get("/api/designers"))
-            .andExpect(status().isUnauthorized)
+    fun `write endpoint requires authentication`() {
+        mockMvc.perform(
+            post("/api/designers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""{"name":"Designer"}""")
+        ).andExpect(status().isUnauthorized)
     }
 
     @Test
-    fun `protected endpoint is accessible with valid token`() {
-        val token = registerAndGetToken()
-
-        mockMvc.perform(
-            get("/api/designers")
-                .header("Authorization", "Bearer $token")
-        ).andExpect(status().isOk)
+    fun `read endpoint is accessible without authentication`() {
+        mockMvc.perform(get("/api/designers"))
+            .andExpect(status().isOk)
     }
 }
